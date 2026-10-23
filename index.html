@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>島遊趣｜台灣環島旅行棋盤遊戲</title>
+  <meta name="description" content="島遊趣：擲骰子、走訪台灣各地景點，完成環島一圈的旅行小遊戲。">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <!-- 字體：Huninn（粉圓）作標題、Noto Sans TC 作內文；載入失敗時會自動使用系統字體 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 頁首：山、海、火車 -->
+  <header class="masthead">
+    <img src="assets/scenery.svg" alt="" aria-hidden="true">
+    <div class="masthead-text">
+      <h1>島遊趣</h1>
+      <p>擲骰子，走訪台灣一圈</p>
+    </div>
+  </header>
+
+  <main class="layout">
+
+    <!-- 棋盤（格子由 game.js 產生） -->
+    <section class="board-wrap" aria-label="遊戲棋盤">
+      <div id="board" class="board">
+
+        <!-- 棋盤中央：骰子與按鈕 -->
+        <div class="center">
+          <img class="center-map" src="assets/taiwan.svg" alt="" aria-hidden="true">
+          <div class="center-content">
+            <div id="die" class="die" role="img" aria-label="骰子">
+              <!-- 9 個點位由 game.js 產生 -->
+            </div>
+            <button id="btn-roll" class="btn btn-primary btn-roll" type="button">擲骰子</button>
+            <p id="hint" class="hint" aria-live="polite">準備好了就出發吧！</p>
+          </div>
+        </div>
+
+        <!-- 玩家棋子 -->
+        <div id="token" class="token" aria-hidden="true">🎒</div>
+      </div>
+    </section>
+
+    <!-- 側邊：旅人手帳 -->
+    <aside class="side">
+      <section class="panel" aria-labelledby="stats-title">
+        <h2 id="stats-title">旅人手帳</h2>
+        <dl class="stats">
+          <div class="stat wide"><dt>📍 目前位置</dt><dd id="stat-pos">出發！環遊台灣</dd></div>
+          <div class="stat"><dt>💰 旅費</dt><dd id="stat-money">NT$ 0</dd></div>
+          <div class="stat"><dt>🌄 旅遊值</dt><dd id="stat-travel">0</dd></div>
+          <div class="stat"><dt>🏛️ 文化值</dt><dd id="stat-culture">0</dd></div>
+          <div class="stat"><dt>📮 走訪景點</dt><dd id="stat-visited">0 / 0</dd></div>
+        </dl>
+        <div class="progress" aria-label="環島進度">
+          <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
+          <p id="progress-text" class="progress-text">環島進度 0 / 24 格</p>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="log-title">
+        <h2 id="log-title">旅途紀錄</h2>
+        <ol id="log" class="log"></ol>
+      </section>
+
+      <details class="panel rules">
+        <summary>玩法說明</summary>
+        <ul>
+          <li>按「擲骰子」，棋子會依點數前進。</li>
+          <li>停在景點可蓋章，獲得旅遊值、文化值，也要付出一點旅費。</li>
+          <li>🎒 旅途奇遇多半是好運；🌦️ 突發事件可能讓你停一回合或退後。</li>
+          <li>繞完一圈回到起點，就能領取你的旅行稱號。</li>
+        </ul>
+      </details>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    島遊趣・純 HTML／CSS／JavaScript 製作
+  </footer>
+
+  <!-- 景點／事件卡片 -->
+  <div id="modal" class="overlay" hidden>
+    <div id="card" class="card" role="dialog" aria-modal="true" aria-labelledby="card-title" data-theme="city">
+      <div class="card-head"><span id="card-tag" class="tag"></span></div>
+      <div id="card-icon" class="card-icon" aria-hidden="true"></div>
+      <h2 id="card-title"></h2>
+      <p id="card-body" class="card-body"></p>
+      <ul id="card-chips" class="chips"></ul>
+      <button id="card-btn" class="btn btn-primary" type="button">繼續</button>
+    </div>
+  </div>
+
+  <!-- 結算畫面 -->
+  <div id="result" class="overlay" hidden>
+    <div class="card result-card" role="dialog" aria-modal="true" aria-labelledby="result-title" data-theme="culture">
+      <div class="card-icon" aria-hidden="true">🎉</div>
+      <h2 id="result-title">恭喜完成台灣環島旅行！</h2>
+      <dl class="result-grid">
+        <div><dt>走訪景點數</dt><dd id="res-visited">0</dd></div>
+        <div><dt>旅遊值</dt><dd id="res-travel">0</dd></div>
+        <div><dt>文化值</dt><dd id="res-culture">0</dd></div>
+        <div><dt>剩餘旅費</dt><dd id="res-money">0</dd></div>
+      </dl>
+      <div class="title-badge">
+        <span class="badge-label">你的旅行稱號</span>
+        <strong id="res-title-name"></strong>
+        <p id="res-title-note"></p>
+      </div>
+      <div class="result-actions">
+        <button id="btn-restart" class="btn btn-primary" type="button">再玩一次</button>
+        <button id="btn-copy" class="btn" type="button">複製成績</button>
+      </div>
+      <p id="copy-status" class="copy-status" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <script src="game.js" defer></script>
+</body>
+</html>

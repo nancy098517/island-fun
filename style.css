@@ -1,0 +1,378 @@
+/* ==========================================================
+   島遊趣 style.css
+   配色取自台灣旅行的日常：海、山、計程車黃、蓋章紅、夜藍墨水
+   ========================================================== */
+
+:root {
+  --ink: #14304a;       /* 夜藍（文字、邊框） */
+  --sea: #2b8aa0;       /* 海水 */
+  --leaf: #5f8f4a;      /* 山林綠 */
+  --taxi: #f1b72b;      /* 計程車黃 */
+  --stamp: #c5402f;     /* 旅行印章紅 */
+  --slate: #6a7f99;     /* 都會灰藍 */
+  --bg: #e8f1ee;        /* 頁面底色（淡海鹽色） */
+  --paper: #fbfdfc;     /* 卡片紙色 */
+  --mint: #d8efe6;      /* 旅途奇遇格 */
+  --mist: #e3e9f2;      /* 突發事件格 */
+
+  --font-title: "Huninn", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.6;
+}
+
+h1, h2 { font-family: var(--font-title); font-weight: 400; margin: 0; }
+
+:focus-visible { outline: 3px solid var(--sea); outline-offset: 3px; }
+
+/* ---------- 頁首 ---------- */
+.masthead {
+  position: relative;
+  height: clamp(128px, 19vw, 176px);
+  overflow: hidden;
+  background: #cfe6ee;
+  border-bottom: 4px solid var(--ink);
+}
+.masthead img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: 70% bottom;
+}
+.masthead-text {
+  position: relative;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 14px 16px;
+}
+.masthead h1 {
+  font-size: clamp(32px, 7vw, 52px);
+  line-height: 1.1;
+  letter-spacing: 0.08em;
+}
+.masthead p { margin: 2px 0 0; font-size: clamp(13px, 2.6vw, 16px); }
+
+/* ---------- 版面 ---------- */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 14px 12px 8px;
+}
+@media (min-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 640px) 340px;
+    justify-content: center;
+    align-items: start;
+    gap: 24px;
+    padding-top: 22px;
+  }
+}
+
+/* ---------- 棋盤 ---------- */
+.board {
+  /* container-type 讓內部可用 cqw（棋盤寬度的 1%）來縮放文字與棋子 */
+  container-type: inline-size;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-rows: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  aspect-ratio: 1;
+  padding: 6px;
+  background: var(--ink);
+  border-radius: 18px;
+}
+
+.cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  overflow: hidden;
+  background: var(--paper);
+  border-radius: 6px;
+  padding-top: 5px;
+  text-align: center;
+}
+/* 景點頂端色帶：用顏色區分山、海、城市、人文 */
+.cell::before {
+  content: "";
+  position: absolute; left: 0; right: 0; top: 0;
+  height: 5px;
+  background: var(--band, transparent);
+}
+.cell[data-theme="sea"]     { --band: var(--sea); }
+.cell[data-theme="green"]   { --band: var(--leaf); }
+.cell[data-theme="city"]    { --band: var(--slate); }
+.cell[data-theme="culture"] { --band: var(--taxi); }
+
+.cell[data-type="start"] { background: var(--taxi); }
+.cell[data-type="chance"] { background: var(--mint); }
+.cell[data-type="event"] { background: var(--mist); }
+
+.cell-icon { font-size: clamp(15px, 5cqw, 30px); line-height: 1.15; }
+.cell-name {
+  font-size: clamp(9px, 2.9cqw, 14px);
+  line-height: 1.15;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* 走訪過的景點蓋上紅色印章 */
+.cell.visited::after {
+  content: "印";
+  position: absolute;
+  right: 1px; top: 6px;
+  width: 1.5em; height: 1.5em;
+  display: grid; place-items: center;
+  font-family: var(--font-title);
+  font-size: clamp(8px, 2.4cqw, 13px);
+  color: var(--stamp);
+  border: 2px solid var(--stamp);
+  border-radius: 50%;
+  transform: rotate(-14deg);
+  background: rgba(251, 253, 252, 0.8);
+}
+
+/* 棋盤中央 */
+.center {
+  grid-row: 2 / 7;
+  grid-column: 2 / 7;
+  position: relative;
+  display: grid;
+  place-items: center;
+  background: #dcebe6;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.center-map {
+  position: absolute;
+  height: 92%;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+}
+.center-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(6px, 2.4cqw, 16px);
+  padding: 0 6px;
+}
+.hint {
+  margin: 0;
+  max-width: 90%;
+  min-height: 2.6em;
+  text-align: center;
+  font-size: clamp(11px, 2.9cqw, 15px);
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+/* 玩家棋子 */
+.token {
+  position: absolute;
+  z-index: 3;
+  width: 6.6cqw; height: 6.6cqw;
+  display: grid; place-items: center;
+  font-size: 4.2cqw;
+  background: var(--taxi);
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  box-shadow: 0 2px 0 var(--ink);
+  transform: translate(-50%, -50%);
+  transition: left 0.28s ease, top 0.28s ease;
+  pointer-events: none;
+}
+.token.no-anim { transition: none; }
+.token.hop { animation: hop 0.3s ease; }
+@keyframes hop {
+  0%   { transform: translate(-50%, -50%); }
+  50%  { transform: translate(-50%, -95%); }
+  100% { transform: translate(-50%, -50%); }
+}
+
+/* ---------- 骰子 ---------- */
+.die {
+  width: clamp(50px, 15cqw, 88px);
+  aspect-ratio: 1;
+  display: grid;
+  grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+  padding: 12%;
+  background: #fff;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  box-shadow: 0 4px 0 var(--ink);
+}
+.pip { border-radius: 50%; background: transparent; }
+.pip.on { background: var(--ink); }
+.die.rolling { animation: shake 0.4s linear infinite; }
+@keyframes shake {
+  0%   { transform: rotate(0deg) translateY(0); }
+  25%  { transform: rotate(-14deg) translateY(-5px); }
+  50%  { transform: rotate(10deg) translateY(0); }
+  75%  { transform: rotate(-8deg) translateY(-3px); }
+  100% { transform: rotate(0deg) translateY(0); }
+}
+
+/* ---------- 按鈕 ---------- */
+.btn {
+  font-family: var(--font-title);
+  font-size: 1.05rem;
+  cursor: pointer;
+  padding: 0.5em 1.6em;
+  color: var(--ink);
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  box-shadow: 0 4px 0 var(--ink);
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+.btn:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: 0 2px 0 var(--ink); }
+.btn-primary { background: var(--taxi); }
+.btn-roll { font-size: clamp(0.95rem, 4cqw, 1.5rem); padding: 0.35em 1.4em; }
+
+/* ---------- 側邊面板 ---------- */
+.side { display: grid; gap: 14px; }
+
+.panel {
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  padding: 12px 14px 14px;
+}
+.panel h2 { font-size: 1.25rem; margin-bottom: 8px; }
+
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; margin: 0; }
+.stat {
+  padding: 6px 0;
+  border-top: 2px dashed var(--line, #c9d9d3);  /* 像車票的虛線 */
+}
+.stat.wide { grid-column: 1 / -1; border-top: 0; }
+.stat dt { font-size: 0.82rem; opacity: 0.8; }
+.stat dd { margin: 0; font-size: 1.15rem; font-weight: 700; }
+.stat dd.bump { animation: bump 0.6s ease; transform-origin: left center; }
+@keyframes bump {
+  0%   { transform: scale(1); color: var(--ink); }
+  35%  { transform: scale(1.18); color: var(--sea); }
+  100% { transform: scale(1); color: var(--ink); }
+}
+
+.progress { margin-top: 8px; }
+.progress-track {
+  height: 12px;
+  background: #dbe6e1;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progress-fill { height: 100%; width: 0; background: var(--leaf); transition: width 0.3s ease; }
+.progress-text { margin: 4px 0 0; font-size: 0.82rem; }
+
+.log { list-style: none; margin: 0; padding: 0; font-size: 0.9rem; }
+.log li { padding: 5px 0; border-top: 1px dashed #c9d9d3; }
+.log li:first-child { border-top: 0; font-weight: 700; }
+.log li:not(:first-child) { opacity: 0.75; }
+
+.rules summary { cursor: pointer; font-family: var(--font-title); font-size: 1.1rem; }
+.rules ul { margin: 8px 0 0; padding-left: 1.2em; font-size: 0.92rem; }
+
+.footer { text-align: center; padding: 14px 12px 24px; font-size: 0.8rem; opacity: 0.7; }
+
+/* ---------- 彈出卡片 ---------- */
+.overlay {
+  position: fixed; inset: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+  background: rgba(20, 48, 74, 0.6);
+  overflow-y: auto;
+}
+.overlay[hidden] { display: none; }
+
+.card {
+  width: min(100%, 400px);
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 0 20px 20px;
+  text-align: center;
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  animation: pop 0.18s ease-out;
+}
+@keyframes pop { from { transform: scale(0.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.card-head {
+  margin: 0 -20px;
+  padding: 8px 12px;
+  background: var(--band, var(--slate));
+  border-bottom: 3px solid var(--ink);
+  border-radius: 12px 12px 0 0;
+}
+.card[data-theme="sea"]     { --band: var(--sea); }
+.card[data-theme="green"]   { --band: var(--leaf); }
+.card[data-theme="city"]    { --band: var(--slate); }
+.card[data-theme="culture"] { --band: var(--taxi); }
+.card[data-theme="chance"]  { --band: #7fc4a8; }
+.card[data-theme="event"]   { --band: #9fb2cc; }
+
+.tag { font-family: var(--font-title); font-size: 0.95rem; color: var(--ink); }
+.card-icon { font-size: 52px; line-height: 1.2; margin-top: 12px; }
+.card h2 { font-size: 1.7rem; margin: 4px 0 6px; }
+.card-body { margin: 0 0 12px; font-size: 1.02rem; }
+
+.chips { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0 0 16px; padding: 0; }
+.chip { padding: 3px 12px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; }
+.chip.good { background: #dff0d8; color: #2f5d1f; }
+.chip.bad  { background: #f8dcd6; color: #8d2a1c; }
+.chip.info { background: #dbe8f2; color: var(--ink); }
+
+/* ---------- 結算 ---------- */
+.result-card { width: min(100%, 440px); }
+.result-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  margin: 8px 0 14px;
+}
+.result-grid div { padding: 8px; background: #eef5f2; border-radius: 8px; }
+.result-grid dt { font-size: 0.82rem; opacity: 0.8; }
+.result-grid dd { margin: 0; font-size: 1.4rem; font-weight: 700; }
+
+.title-badge {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 3px dashed var(--stamp);
+  border-radius: 12px;
+  color: var(--stamp);
+  transform: rotate(-1.5deg);
+}
+.badge-label { display: block; font-size: 0.82rem; }
+.title-badge strong { display: block; font-family: var(--font-title); font-weight: 400; font-size: 1.8rem; line-height: 1.3; }
+.title-badge p { margin: 4px 0 0; font-size: 0.92rem; color: var(--ink); }
+
+.result-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.copy-status { min-height: 1.4em; margin: 10px 0 0; font-size: 0.85rem; }
+
+/* ---------- 偏好：減少動態 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .die.rolling, .token.hop, .stat dd.bump, .card { animation: none; }
+  .token { transition: none; }
+}
