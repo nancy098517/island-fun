@@ -390,3 +390,67 @@ h1, h2 { font-family: var(--font-title); font-weight: 400; margin: 0; }
 .plan-links button { font:inherit; background:white; border:1px solid #9aafb6; border-radius:5px; padding:.2rem .45rem; cursor:pointer; }
 #plan-fallback { width:100%; box-sizing:border-box; font:inherit; }
 .result-actions { flex-wrap:wrap; }
+/* 決策入口與探索地圖 */
+[hidden] { display:none !important; }
+.explorer { max-width:1080px; margin:0 auto; padding:22px 16px; }
+.ex-modes { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px; }
+.ex-modes button { min-height:60px;border:2px solid var(--ink);border-radius:12px;background:var(--paper);color:var(--ink);font:inherit;font-weight:700;padding:10px;cursor:pointer; }
+.ex-modes button[aria-pressed="true"] { background:var(--taxi);box-shadow:0 4px 0 var(--ink); }
+.ex-heading { margin:28px 0 18px; }
+.ex-heading h2 { font-size:clamp(26px,5vw,38px); }
+.ex-heading p { max-width:680px; }
+.ex-eyebrow { color:#296d62;font-size:.85rem;letter-spacing:.12em;font-weight:bold;margin:0 0 6px; }
+.ex-controls { display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:#d6e7df;border-radius:12px;padding:16px;margin-bottom:18px; }
+.ex-controls details { width:100%; }
+.ex-controls details label, #ex-custom-editor label {display:block;margin:12px 0 6px;}
+.ex-controls select, #replace-cell { max-width:100%;padding:10px;border:2px solid var(--ink);border-radius:8px;font:inherit;background:white;color:var(--ink); }
+#replace-cell { width:100%;margin-bottom:10px; }
+.ex-grid { display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:start; }
+.ex-machine { text-align:center; }
+.ex-visual { width: min(100%,320px);aspect-ratio:1;margin:0 auto;display:grid;place-items:center; }
+.ex-visual svg { width:100%;height:100%; }
+.ex-dice { font-size:clamp(48px,8vw,90px);color:var(--ink); }
+.ex-draw-actions,.ex-route-actions { display:flex;gap:10px;flex-wrap:wrap;justify-content:center; }
+.ex-draw-actions .btn,.ex-route-actions .btn { font-size:.95rem;padding:.5em 1em; }
+.ex-count { margin:4px 0 14px;font-weight:700; }
+.ex-result { background:#e5f2e4;border:2px dashed #557e50;border-radius:12px;padding:16px;margin:18px 0 8px; }
+.ex-result h3 {font-size:1.5rem;margin:3px 0 8px;overflow-wrap:anywhere;}
+#ex-status { min-height:3em;line-height:1.7;overflow-wrap:anywhere; }
+.ex-route { padding-left:24px;max-height:480px;overflow:auto; }
+.ex-route li { padding:10px 0;border-bottom:1px dashed #b7c9c1;overflow-wrap:anywhere; }
+.ex-route-links {display:flex;flex-wrap:wrap;gap:12px;font-size:.85rem;margin-top:6px;align-items:center;}
+.ex-route-links button {border:1px solid #9aafb6;border-radius:5px;background:white;color:var(--ink);padding:5px 8px;font:inherit;cursor:pointer;}
+.explorer a { color:#176579;text-underline-offset:3px; }
+.ex-map-panel { margin-top:20px; }
+.ex-candidates {list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:0;max-height:440px;overflow:auto;}
+.ex-candidates li {background:#e7eee9;border-top:4px solid var(--sea);border-radius:8px;min-height:70px;padding:12px;display:grid;align-items:center;overflow-wrap:anywhere;font-size:.95rem;}
+.ex-candidates li.ex-visited {background:#f9efd1;border-color:var(--taxi);}
+#ex-custom-editor {margin-top:12px;} #ex-custom-editor summary,.ex-sources summary {cursor:pointer;}
+.explorer textarea {width:100%;box-sizing:border-box;border:1px solid #55717b;border-radius:8px;padding:10px;font:inherit;margin-bottom:12px;}
+.ex-sources {font-size:.85rem;margin-top:20px;}
+@media(max-width:700px) { .ex-modes{grid-template-columns:repeat(2,minmax(0,1fr));}.ex-grid{grid-template-columns:minmax(0,1fr);}.ex-candidates{grid-template-columns:repeat(2,minmax(0,1fr));}.explorer{padding:16px 12px;}.ex-controls .btn{font-size:.9rem;padding:.5em 1em;} }
+.ex-modes { grid-template-columns:repeat(5,minmax(0,1fr)); }
+.ex-lottery { margin-top:24px;max-width:760px;margin-left:auto;margin-right:auto;padding:22px; }
+.ex-lottery h2 {font-size:2rem;}
+.ex-lottery label {display:block;margin:14px 0 8px;}
+.lottery-controls {display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.lottery-controls label {margin:0;}
+#lottery-count {width:90px;max-width:100%;padding:10px;border:2px solid var(--ink);border-radius:8px;font:inherit;}
+.lottery-results li {padding:12px;background:#e0efe3;border-radius:8px;margin:8px 0;overflow-wrap:anywhere;font-weight:700;}
+#lottery-status {min-height:1.6em;}
+@media(max-width:700px) {.ex-modes{grid-template-columns:repeat(2,minmax(0,1fr));}.ex-modes button:last-child{grid-column:1/-1;}.ex-lottery{padding:16px;}}
+.ex-train-note {font-size:.85rem;line-height:1.7;background:#e1ebf0;border-left:4px solid var(--sea);padding:10px;text-align:left;white-space:pre-line;overflow-wrap:anywhere;}
+.google-place-map {margin-top:22px;}
+.google-map-heading {display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;}
+.google-map-heading a {font-size:.85rem;}
+#google-place-frame {display:block;border:0;border-radius:10px;width:100%;height:350px;background:#dde9e4;}
+#google-place-label {font-weight:700;overflow-wrap:anywhere;}
+.ex-candidates li button {padding:0;border:0;background:none;text-align:left;font:inherit;cursor:pointer;color:var(--ink);width:100%;overflow-wrap:anywhere;}
+#ex-result-map button {padding:6px 12px;border:1px solid #55717b;border-radius:6px;background:white;font:inherit;cursor:pointer;color:var(--ink);}
+@media(max-width:700px){#google-place-frame{height:280px;}}
+.map-share-actions {display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px;}
+.map-share-actions .btn {font-size:.9rem;padding:.5em 1em;}
+.map-share-actions select {font:inherit;max-width:100%;padding:8px;border:1px solid var(--ink);border-radius:6px;}
+#map-share-status {font-size:.9rem;min-height:1.5em;}
+
+@font-face {font-family:"Island Trip TC";src:url("assets/island-trip-tc.ttf") format("truetype");font-style:normal;font-weight:400;font-display:swap;}

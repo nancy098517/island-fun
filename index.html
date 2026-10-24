@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20261024-7">
 </head>
 <body>
 
@@ -19,11 +19,69 @@
     <img src="assets/scenery.svg" alt="" aria-hidden="true">
     <div class="masthead-text">
       <h1>島遊趣</h1>
-      <p>擲骰子，走訪台灣一圈</p>
+      <p>今天放假去哪玩？中午吃什麼？交給島遊趣。</p>
     </div>
   </header>
 
-  <main class="layout">
+  <section class="explorer" aria-label="旅行模式">
+    <nav class="ex-modes" aria-label="選擇玩法">
+      <button data-ex-mode="taiwan" type="button">🗺️ 遊台灣</button>
+      <button data-ex-mode="county" type="button">📍 選縣市玩</button>
+      <button data-ex-mode="lunch" type="button">🍱 中科大午餐</button>
+      <button data-ex-mode="lottery" type="button">🎟️ 自訂抽籤</button>
+      <button data-ex-mode="classic" type="button">🎒 經典環島棋盤</button>
+    </nav>
+    <section id="google-place-map" class="panel google-place-map" aria-labelledby="google-place-title">
+      <div class="google-map-heading"><h2 id="google-place-title">📍 Google Maps 地點標示</h2><a id="google-place-external" target="_blank" rel="noopener noreferrer">在 Google Maps 開啟</a></div>
+      <p id="google-place-label" role="status"></p>
+      <iframe id="google-place-frame" title="Google Maps 地點" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <div class="map-share-actions"><button id="map-copy-link" class="btn" type="button">複製地圖連結</button><button id="map-copy-invite" class="btn" type="button">複製邀約文字</button><button id="map-share" class="btn" type="button">分享給朋友</button></div>
+      <div class="map-share-actions"><label for="share-image-format">行程分享圖</label><select id="share-image-format"><option value="square">FB／IG 方形貼文</option><option value="story">IG 限時動態</option></select><button id="map-download-image" class="btn" type="button">下載分享圖 PNG</button></div><p id="map-share-status" role="status"></p><label id="map-copy-fallback-label" for="map-copy-fallback" hidden>請選取文字手動複製</label><textarea id="map-copy-fallback" readonly rows="6" hidden></textarea>
+      <p class="plan-note">分享圖是行程卡，不含 Google 地圖截圖。發文時可另外貼上邀約文字與地圖連結。</p>
+      <p class="plan-note">抽到地點會在這張地圖標示；點清單中的地點可切換查看。一次查看一個地點，不繪製交通路線。店名可能有同名或分店，請確認標示是否正確。</p>
+    </section>
+    <section id="ex-lottery" class="panel ex-lottery" hidden aria-labelledby="lottery-title">
+      <p class="ex-eyebrow">不只旅行，任何選擇都能抽。</p><h2 id="lottery-title">自訂抽籤</h2>
+      <p>一行貼一個設定值，輸入這次要抽出幾個選擇，再按「開始抽籤」。同次不重複抽出相同選項。</p>
+      <label for="lottery-values">抽籤選項（每行一個，最多 200 個；重複內容會合併）</label>
+      <textarea id="lottery-values" rows="9" placeholder="選項一&#10;選項二&#10;選項三"></textarea>
+      <div class="lottery-controls"><label for="lottery-count">要抽出幾個？</label><input type="number" id="lottery-count" min="1" max="200" step="1" value="1"><button id="lottery-start" type="button" class="btn btn-primary">開始抽籤</button></div>
+      <p id="lottery-status" role="status" aria-live="polite"></p><ol id="lottery-results" class="lottery-results"></ol>
+      <button type="button" id="lottery-copy" class="btn" disabled>複製抽籤結果</button><label id="lottery-copy-label" for="lottery-fallback" hidden>請選取文字手動複製</label><textarea id="lottery-fallback" rows="6" readonly hidden></textarea>
+      <p class="plan-note">每次開始都是新的一輪，所有輸入選項都有機會被選中。輸入、數量與上次結果會保存在此瀏覽器。</p><p id="lottery-save" class="plan-note" role="status"></p>
+    </section>
+    <div id="ex-play">
+      <div class="ex-heading"><p class="ex-eyebrow">把猶豫，變成下一站。</p><h2 id="ex-title"></h2><p id="ex-description"></p></div>
+      <div id="ex-county-controls" class="ex-controls" hidden>
+        <label for="ex-county">縣市地圖</label><select id="ex-county"></select><button id="ex-reroll-county" class="btn" type="button">重新抽縣市</button>
+      </div>
+      <div id="ex-lunch-controls" class="ex-controls" hidden>
+        <label for="ex-campus">中科大校區</label><select id="ex-campus"><option>三民校區</option><option>民生校區</option></select>
+        <details><summary>編輯午餐選項（餐點類型或店家）</summary><label for="ex-foods">每行一個選項，最多 40 個</label><textarea id="ex-foods" rows="6"></textarea><button id="ex-save-foods" type="button" class="btn">儲存午餐選項</button> <button id="ex-reset-foods" type="button" class="btn">恢復預設 16 個選項</button></details>
+        <p class="plan-note">預設為 Nancy 提供的店家與餐點選項，名稱依原文保留。地圖連結搜尋所選校區附近；未驗證店家距離與午間營業狀況。</p>
+      </div>
+      <div id="ex-departure" class="ex-controls"><label for="ex-origin">遊戲出發縣市</label><select id="ex-origin"></select><p class="plan-note">首次抽景點會先抽交通卡；之後依上一站縣市抽交通。列車卡為遊戲事件，現實班次與停靠站請另查。</p></div>
+      <div class="ex-grid"><section class="panel ex-machine">
+        <h2 id="ex-next-label"></h2><div id="ex-visual" class="ex-visual"></div>
+        <p class="ex-count" id="ex-count"></p><div class="ex-draw-actions">
+          <button type="button" class="btn" data-draw="dice">🎲 擲骰子</button><button type="button" class="btn" data-draw="dart">🎯 擲飛鏢</button><button type="button" class="btn btn-primary" data-draw="wheel">🎡 轉輪盤</button>
+        </div><p class="plan-note">三種方式皆為隨機抽選。骰子以六進位編碼對應候選編號；飛鏢為模擬隨機投擲。</p>
+        <div id="ex-result" class="ex-result" hidden><span>這次選到</span><h3 id="ex-result-name"></h3><div id="ex-result-map"></div><p id="ex-result-transport" class="ex-train-note"></p></div>
+        <p id="ex-status" role="status" aria-live="polite">選一種玩法，決定下一站。</p>
+      </section><section class="panel">
+        <h2 id="ex-route-title"></h2><p id="ex-empty" class="plan-note">抽到景點後，會依順序加入這裡。</p><ol id="ex-route" class="ex-route"></ol>
+        <div class="ex-route-actions"><button id="ex-copy" type="button" class="btn">複製行程</button><button id="ex-clear" type="button" class="btn">重開這張地圖</button></div>
+        <label id="ex-manual-label" for="ex-manual-copy" hidden>請選取文字手動複製</label><textarea id="ex-manual-copy" readonly rows="8" hidden></textarea>
+        <p id="ex-save" role="status" class="plan-note"></p><p class="plan-note">各縣市、各校區分開保留抽選紀錄。同張地圖不重複抽已加入行程的地點，全部抽完可重新開始。抽選順序未依距離最佳化，跨縣市或離島請分天安排。</p>
+      </section></div>
+      <section class="panel ex-map-panel"><h2>這張地圖的候選地點</h2><p class="plan-note">這是抽選探索棋盤，非地理位置圖。格子編號對應輪盤區域；實際位置請開啟地圖查詢。</p><div id="ex-area-map"></div>
+        <details id="ex-custom-editor"><summary>✏️ 自訂這張地圖的地點</summary><label for="ex-map-places">每行一個地點；套用後會替換整張候選地圖並重開此地圖的抽選紀錄。</label><textarea id="ex-map-places" rows="7"></textarea><div class="ex-route-actions"><button id="ex-apply-map" class="btn btn-primary" type="button">套用到這張地圖</button><button id="ex-default-map" class="btn" type="button">恢復預設地點</button></div></details>
+        <ol id="ex-candidate-list" class="ex-candidates"></ol>
+      </section>
+      <details class="ex-sources"><summary>景點參考與使用提醒</summary><p>預設地點僅供旅行靈感，開放、收費及營業狀況請以各館舍與店家公告為準。</p><a href="https://www.taiwan.net.tw/m1.aspx?sNo=0001016" target="_blank" rel="noopener noreferrer">交通部觀光署景點資訊</a> · <a href="https://www.twtainan.net/zh-tw/shop/consume/1113/" target="_blank" rel="noopener noreferrer">莉莉水果店｜臺南旅遊網</a></details>
+    </div>
+  </section>
+  <main class="layout" id="classic-game" hidden>
 
     <!-- 棋盤（格子由 game.js 產生） -->
     <section class="board-wrap" aria-label="遊戲棋盤">
@@ -49,7 +107,7 @@
     <!-- 側邊：旅人手帳 -->
     <aside class="side">
       <section class="panel" aria-labelledby="stats-title">
-        <h2 id="stats-title">旅人手帳</h2>
+        <h2 id="stats-title">旅人手帳</h2><p id="departure-note" class="ex-train-note">第一回合會依落點抽出發交通卡。</p>
         <dl class="stats">
           <div class="stat wide"><dt>📍 目前位置</dt><dd id="stat-pos">出發！環遊台灣</dd></div>
           <div class="stat"><dt>💰 旅費</dt><dd id="stat-money">NT$ 0</dd></div>
@@ -65,11 +123,11 @@
 
       <section class="panel" aria-labelledby="plan-title" id="planner">
         <h2 id="plan-title">我的旅行行程</h2>
-        <p class="plan-note">蓋章景點會依走訪順序加入；也可以補上想吃、想逛的地點。清單是旅行靈感，跨縣市或離島請分天安排。</p>
+        <p class="plan-note">蓋章景點會依走訪順序加入。下方可選擇景點格，換成你想玩的地點。清單是旅行靈感，跨縣市或離島請分天安排。</p>
         <form id="place-form" class="place-form">
-          <label for="place-name">自訂地點（建議含縣市）</label>
-          <div class="place-input"><input id="place-name" maxlength="80" placeholder="例如：台中 第二市場" required><button class="btn" type="submit">加入</button></div>
-        </form>
+          <label for="replace-cell">要替換的景點格</label><select id="replace-cell"></select><label for="place-name">新地點（建議含縣市）</label>
+          <div class="place-input"><input id="place-name" maxlength="80" placeholder="例如：台中 第二市場" required><button class="btn" type="submit">替換地圖格子</button></div>
+        </form><p class="plan-note">替換格子會重新開始環島回合與行程；自訂棋盤會保留至下次開啟。</p><button type="button" class="btn" id="reset-board">恢復原始環島地圖</button>
         <ol id="itinerary" class="itinerary"></ol>
         <button id="copy-plan" type="button" class="btn">複製行程</button>
         <p id="plan-status" role="status" class="plan-note"></p>
@@ -140,6 +198,9 @@
     </div>
   </div>
 
-  <script src="game.js" defer></script>
+  <script src="transport.js?v=20261024-7" defer></script>
+  <script src="place-map.js?v=20261024-7" defer></script>
+  <script src="game.js?v=20261024-7" defer></script>
+  <script src="explore.js?v=20261024-7" defer></script>
 </body>
 </html>

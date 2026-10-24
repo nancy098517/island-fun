@@ -63,6 +63,9 @@
     spot("新竹", "新竹", "🌬️", "city", "北部", "九降風吹過，來碗貢丸湯、逛逛城隍廟。", { travel: 15, culture: 10, money: -80 }),
   ];
 
+  const ORIGINAL_BOARD = BOARD.map(c => ({ ...c }));
+  let boardOverrides = {};
+
   // 旅途奇遇：move 正數＝前進、負數＝退後；skip＝停止幾回合
   const CHANCE_CARDS = [
     { icon: "🧑‍🤝‍🧑", title: "熱心旅人", text: "遇到熱心旅人推薦私房景點，帶你抄了近路。", effect: { move: 2 } },
@@ -132,6 +135,7 @@
       over: false,
       log: [],
       itinerary: [],
+      departure: null,
     };
   }
 
@@ -328,6 +332,7 @@
   }
 
   async function visitSpot(cell, idx) {
+    IslandMap.show(cell.name + " 台灣",cell.name);
     const first = !state.visited.has(idx);
     // 重複造訪（例如被退後推回來）只給一點散步的旅遊值
     const effect = first ? cell.effect : { travel: 5 };
@@ -405,6 +410,15 @@
       const roll = await rollDice();
       say(`擲出 ${roll} 點！`);
       await moveBy(roll);
+      if (state.turn === 1) {
+        const to = ({1:"新北市",2:"臺北市",3:"新北市",5:"宜蘭縣",6:"花蓮縣"})[position()] || "";
+        const card = IslandTransport.draw("臺北市", to);
+        await showCard({icon:card.icon,tag:"出發交通卡・遊戲事件",title:`搭到${card.name}！`,body:card.note,chips:effectChips({travel:card.travel}),button:"登車，繼續旅程"});
+        state.departure = card;
+        applyStats({travel:card.travel});
+        say(`出發搭到${card.name}，旅遊值 +${card.travel}。`);
+        $("#departure-note").textContent = IslandTransport.text(card);
+      }
       if (!isFinished()) await resolveCell();
       if (isFinished()) finishGame();
     } finally {
@@ -452,6 +466,7 @@
   function startGame() {
     state = newState();
     lastCardTitle = "";
+    $("#departure-note").textContent = "第一回合會依落點抽出發交通卡。";
     cellEls.forEach((el) => el.classList.remove("visited"));
     els.result.hidden = true;
     els.roll.disabled = false;
@@ -470,7 +485,7 @@
     try {
       localStorage.setItem(SAVE_KEY, JSON.stringify({ version: 1, state: {
         ...state, busy: false, visited: [...state.visited]
-      }, lastCardTitle }));
+      }, lastCardTitle, boardOverrides }));
       $("#save-status").textContent = "已自動儲存完成的回合與行程。";
     } catch {
       $("#save-status").textContent = "目前無法儲存，關閉後可能遺失進度。請先複製行程。";
@@ -486,9 +501,14 @@
         || !Array.isArray(s.visited) || !s.visited.every(i => Number.isInteger(i) && BOARD[i]?.type === "spot")
         || !Array.isArray(s.log) || !s.log.every(t => typeof t === "string")
         || !Array.isArray(s.itinerary) || s.itinerary.length > 200 || !s.itinerary.every(t => typeof t.name === "string" && t.name.trim() && t.name.length <= 80 && ["stamp", "custom"].includes(t.source))) return false;
+      const overrides = saved.boardOverrides || {};
+      if (typeof overrides !== "object" || Array.isArray(overrides) || !Object.entries(overrides).every(([i,n]) => ORIGINAL_BOARD[i]?.type === "spot" && typeof n === "string" && n.trim() && n.length <= 80)) return false;
+      boardOverrides = overrides;
+      rebuildClassicBoard();
       state = { ...s, visited: new Set(s.visited), busy: false };
       lastCardTitle = typeof saved.lastCardTitle === "string" ? saved.lastCardTitle : "";
       state.visited.forEach(i => cellEls[i].classList.add("visited"));
+      $("#departure-note").textContent = state.departure && typeof state.departure.name === "string" && typeof state.departure.note === "string" ? IslandTransport.text(state.departure) : "第一回合會依落點抽出發交通卡。";
       renderStats(); renderPlan(); showFace(1); placeToken(false);
       els.log.replaceChildren(...state.log.slice(0, CONFIG.logLines).map(t => {
         const li = document.createElement("li"); li.textContent = t; return li;
@@ -500,15 +520,14 @@
     } catch { return false; }
   }
   const mapLink = name => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(name + " 台灣");
-  const transitLink = (from, to) => "https://www.google.com/maps/dir/?api=1&origin=" + encodeURIComponent(from + " 台灣") + "&destination=" + encodeURIComponent(to + " 台灣") + "&travelmode=transit";
   function renderPlan() {
+    if (!$("#classic-game").hidden) IslandMap.setTrip("島遊趣環島邀約", state.itinerary.map(x => ({name:x.name,query:x.name+" 台灣"})));
     $("#itinerary").replaceChildren(...state.itinerary.map((item, i) => {
       const li = document.createElement("li");
       const name = document.createElement("span"); name.textContent = item.name + (item.source === "stamp" ? " · 已蓋章" : " · 自訂"); li.append(name);
       const actions = document.createElement("div"); actions.className = "plan-links";
       function link(label, url) { const a = document.createElement("a"); a.textContent = label; a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer"; actions.append(a); }
-      link("查看地點", mapLink(item.name));
-      if (i) link("從上一站查大眾運輸", transitLink(state.itinerary[i-1].name, item.name));
+      const marker = document.createElement("button"); marker.type = "button"; marker.textContent = "在地圖標示"; marker.onclick = () => IslandMap.show(item.name + " 台灣", item.name); actions.append(marker);
       const remove = document.createElement("button"); remove.type = "button"; remove.textContent = "移除"; remove.setAttribute("aria-label", "從行程移除" + item.name);
       remove.onclick = () => { state.itinerary.splice(i, 1); renderPlan(); if (!state.busy) saveGame(); };
       actions.append(remove); li.append(actions); return li;
@@ -516,20 +535,35 @@
     if (!state.itinerary.length) $("#itinerary").textContent = "還沒有地點，蓋章或加入自訂地點開始規劃。";
     $("#copy-plan").disabled = !state.itinerary.length;
     $("#plan-fallback").hidden = true; $("#fallback-label").hidden = true;
-    $("#plan-status").textContent = "交通連結提供查詢；實際班次、營業與開放狀況請出發前確認。";
+    $("#plan-status").textContent = "地點可開啟地圖查看，行程可複製留存。";
   }
   function itineraryText() {
-    return "《島遊趣》我的旅行行程\n" + state.itinerary.map((item, i) =>
-      `${i+1}. ${item.name}\n地點：${mapLink(item.name)}` + (i ? `\n從上一站查大眾運輸：${transitLink(state.itinerary[i-1].name, item.name)}` : "")
-    ).join("\n\n") + "\n\n這是依加入順序整理的旅行靈感，並非已驗證的可行路線。跨縣市或離島請分天安排；班次、轉乘、營業與開放狀況請出發前確認。";
+    return "《島遊趣》我的旅行行程\n" + (state.departure ? "出發交通遊戲卡：" + IslandTransport.text(state.departure) + "\n\n" : "") + state.itinerary.map((item, i) =>
+      `${i+1}. ${item.name}\n地點：${mapLink(item.name)}`
+    ).join("\n\n") + "\n\n這是依加入順序整理的旅行靈感，並非已驗證的可行路線。跨縣市或離島請分天安排；營業與開放狀況請出發前確認。";
+  }
+  function rebuildClassicBoard() {
+    BOARD.forEach((_,i) => { BOARD[i] = { ...ORIGINAL_BOARD[i] }; if (boardOverrides[i]) BOARD[i] = { ...BOARD[i], name: boardOverrides[i], short: boardOverrides[i].slice(0,5), icon: "📍", region: "自訂", text: "你指定的旅行地點，出發前記得確認開放與交通資訊。" }; });
+    cellEls.forEach(el => el.remove()); cellEls.length = 0; buildBoard();
+    updateReplacementChoices();
+  }
+  function updateReplacementChoices() {
+    $("#replace-cell").replaceChildren(...BOARD.flatMap((c,i) => c.type === "spot" ? [new Option(`${i}：${c.name}`, String(i))] : []));
   }
   function setupPlanner() {
+    updateReplacementChoices();
+    $("#reset-board").onclick = () => {
+      if (state.busy) { $("#plan-status").textContent = "請先完成目前回合。"; return; }
+      if (confirm("恢復原始地圖並重新開始環島回合與行程？")) { boardOverrides = {}; rebuildClassicBoard(); startGame(); }
+    };
     $("#place-form").addEventListener("submit", e => {
       e.preventDefault(); const input = $("#place-name"), name = input.value.trim();
       if (!name) { input.setCustomValidity("請輸入地點名稱"); input.reportValidity(); return; }
-      if (state.itinerary.length >= 180) { $("#plan-status").textContent = "行程地點已達上限，請先移除部分地點。"; return; }
-      state.itinerary.push({ name: name.slice(0,80), source: "custom" }); input.value = "";
-      renderPlan(); if (!state.busy) saveGame(); input.focus();
+      if (state.busy) { $("#plan-status").textContent = "請先完成目前回合，再替換地圖格子。"; return; }
+      if (!confirm("替換景點格子會重新開始環島回合與行程，是否套用？")) return;
+      const idx = Number($("#replace-cell").value);
+      boardOverrides[idx] = name.slice(0,80);
+      rebuildClassicBoard(); startGame(); input.value = ""; input.focus();
     });
     $("#place-name").addEventListener("input", e => e.target.setCustomValidity(""));
     $("#copy-plan").onclick = async () => {
@@ -561,6 +595,7 @@
       result: $("#result"),
     });
 
+    document.addEventListener("island:classic", () => { IslandMap.setTrip("島遊趣環島邀約", state.itinerary.map(x=>({name:x.name,query:x.name+" 台灣"}))); IslandMap.show(BOARD[position()].type === "spot" ? BOARD[position()].name + " 台灣" : "台灣", BOARD[position()].type === "spot" ? BOARD[position()].name : "台灣環島"); placeToken(false); if (state.over) finishGame(); });
     buildBoard();
     buildDie();
     setupPlanner();
@@ -576,18 +611,11 @@
     else window.addEventListener("resize", realign);
 
     if (restored) {
-      if (state.over) finishGame();
+      if (state.over && !$("#classic-game").hidden) finishGame();
       return;
     }
 
-    // 開場說明卡
-    await showCard({
-      icon: "🚆", tag: "歡迎登車", theme: "culture",
-      title: "島遊趣",
-      body: "擲骰子、走訪景點，繞台灣一圈回到起點就完成旅程。留意旅費，也別錯過旅途中的奇遇！",
-      chips: [{ text: `共 ${TOTAL_SPOTS} 個景點可以蓋章`, kind: "info" }],
-      button: "出發！",
-    });
+    // 決策首頁直接可用，經典棋盤不自動彈出開場卡。
     placeToken(false);
   }
 
