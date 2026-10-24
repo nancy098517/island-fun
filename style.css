@@ -376,3 +376,17 @@ h1, h2 { font-family: var(--font-title); font-weight: 400; margin: 0; }
   .die.rolling, .token.hop, .stat dd.bump, .card { animation: none; }
   .token { transition: none; }
 }
+
+/* 旅行規劃與存檔 */
+.plan-note { font-size: .85rem; line-height: 1.7; color: #425965; }
+.place-form label { display:block; font-size:.9rem; margin-bottom:.4rem; }
+.place-input { display:flex; gap:.4rem; flex-wrap:wrap; }
+.place-input input { flex:1; min-width:0; width:100%; border:1px solid #55717b; border-radius:8px; padding:.65rem; font:inherit; }
+.place-input .btn { padding:.5rem .8rem; }
+.itinerary { padding-left:1.5rem; max-height:20rem; overflow:auto; }
+.itinerary li { padding:.6rem 0; border-bottom:1px dashed #b8c8cb; overflow-wrap:anywhere; }
+.plan-links { display:flex; gap:.6rem; flex-wrap:wrap; align-items:center; margin-top:.3rem; font-size:.8rem; }
+.plan-links a { color:#176579; text-underline-offset:3px; }
+.plan-links button { font:inherit; background:white; border:1px solid #9aafb6; border-radius:5px; padding:.2rem .45rem; cursor:pointer; }
+#plan-fallback { width:100%; box-sizing:border-box; font:inherit; }
+.result-actions { flex-wrap:wrap; }

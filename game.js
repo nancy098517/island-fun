@@ -90,7 +90,7 @@
   // 旅行稱號：由上而下檢查，第一個符合的就是你的稱號
   const TITLES = [
     { name: "環島傳奇旅人", note: "景點、文化、旅費樣樣兼顧，簡直是島上活地圖。",
-      test: (s) => s.visited >= 6 && s.travel + s.culture >= 180 },
+      test: (s) => s.visited.size >= 6 && s.travel + s.culture >= 180 },
     { name: "島嶼策展人", note: "你把旅行走成了一場展覽，處處是文化的細節。",
       test: (s) => s.culture >= 60 && s.culture >= s.travel * 0.6 },
     { name: "山海探險家", note: "山、海、稻浪都被你收進行程，旅遊值滿滿。",
@@ -98,7 +98,7 @@
     { name: "精打細算背包客", note: "花得少、玩得巧，連優惠車票都被你找到了。",
       test: (s) => s.money >= 2700 },
     { name: "隨興漫遊旅人", note: "沒有固定路線也很好，風吹到哪就走到哪。",
-      test: (s) => s.visited <= 3 },
+      test: (s) => s.visited.size <= 3 },
     { name: "快樂小旅人", note: "一路吃吃逛逛，帶著好心情完成環島！",
       test: () => true },
   ];
@@ -131,6 +131,7 @@
       busy: false,              // 回合進行中（避免重複點擊）
       over: false,
       log: [],
+      itinerary: [],
     };
   }
 
@@ -343,6 +344,8 @@
 
     if (first) {
       state.visited.add(idx);
+      state.itinerary.push({ name: cell.name, source: "stamp" });
+      renderPlan();
       cellEls[idx].classList.add("visited");
     }
     applyStats(effect);
@@ -407,6 +410,7 @@
     } finally {
       state.busy = false;
       els.roll.disabled = state.over;
+      saveGame();
     }
   }
 
@@ -447,6 +451,7 @@
 
   function startGame() {
     state = newState();
+    lastCardTitle = "";
     cellEls.forEach((el) => el.classList.remove("visited"));
     els.result.hidden = true;
     els.roll.disabled = false;
@@ -455,6 +460,88 @@
     placeToken(false);
     els.log.replaceChildren();
     els.hint.textContent = "按下「擲骰子」出發吧！";
+    renderPlan();
+    saveGame();
+  }
+
+  /* ---------- 存檔與旅行行程 ---------- */
+  const SAVE_KEY = "island-fun-save-v1";
+  function saveGame() {
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify({ version: 1, state: {
+        ...state, busy: false, visited: [...state.visited]
+      }, lastCardTitle }));
+      $("#save-status").textContent = "已自動儲存完成的回合與行程。";
+    } catch {
+      $("#save-status").textContent = "目前無法儲存，關閉後可能遺失進度。請先複製行程。";
+    }
+  }
+  function restoreGame() {
+    try {
+      const raw = localStorage.getItem(SAVE_KEY);
+      if (!raw) return false;
+      const saved = JSON.parse(raw), s = saved.state;
+      if (saved.version !== 1 || !s || !["totalSteps", "money", "travel", "culture", "skip", "turn"].every(k => Number.isSafeInteger(s[k]) && s[k] >= 0)
+        || s.totalSteps > MAX_STEPS || typeof s.over !== "boolean" || s.over !== (s.totalSteps === MAX_STEPS)
+        || !Array.isArray(s.visited) || !s.visited.every(i => Number.isInteger(i) && BOARD[i]?.type === "spot")
+        || !Array.isArray(s.log) || !s.log.every(t => typeof t === "string")
+        || !Array.isArray(s.itinerary) || s.itinerary.length > 200 || !s.itinerary.every(t => typeof t.name === "string" && t.name.trim() && t.name.length <= 80 && ["stamp", "custom"].includes(t.source))) return false;
+      state = { ...s, visited: new Set(s.visited), busy: false };
+      lastCardTitle = typeof saved.lastCardTitle === "string" ? saved.lastCardTitle : "";
+      state.visited.forEach(i => cellEls[i].classList.add("visited"));
+      renderStats(); renderPlan(); showFace(1); placeToken(false);
+      els.log.replaceChildren(...state.log.slice(0, CONFIG.logLines).map(t => {
+        const li = document.createElement("li"); li.textContent = t; return li;
+      }));
+      els.hint.textContent = "已接續上次完成的回合。";
+      els.roll.disabled = state.over;
+      $("#save-status").textContent = "已讀取上次進度與行程。";
+      return true;
+    } catch { return false; }
+  }
+  const mapLink = name => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(name + " 台灣");
+  const transitLink = (from, to) => "https://www.google.com/maps/dir/?api=1&origin=" + encodeURIComponent(from + " 台灣") + "&destination=" + encodeURIComponent(to + " 台灣") + "&travelmode=transit";
+  function renderPlan() {
+    $("#itinerary").replaceChildren(...state.itinerary.map((item, i) => {
+      const li = document.createElement("li");
+      const name = document.createElement("span"); name.textContent = item.name + (item.source === "stamp" ? " · 已蓋章" : " · 自訂"); li.append(name);
+      const actions = document.createElement("div"); actions.className = "plan-links";
+      function link(label, url) { const a = document.createElement("a"); a.textContent = label; a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer"; actions.append(a); }
+      link("查看地點", mapLink(item.name));
+      if (i) link("從上一站查大眾運輸", transitLink(state.itinerary[i-1].name, item.name));
+      const remove = document.createElement("button"); remove.type = "button"; remove.textContent = "移除"; remove.setAttribute("aria-label", "從行程移除" + item.name);
+      remove.onclick = () => { state.itinerary.splice(i, 1); renderPlan(); if (!state.busy) saveGame(); };
+      actions.append(remove); li.append(actions); return li;
+    }));
+    if (!state.itinerary.length) $("#itinerary").textContent = "還沒有地點，蓋章或加入自訂地點開始規劃。";
+    $("#copy-plan").disabled = !state.itinerary.length;
+    $("#plan-fallback").hidden = true; $("#fallback-label").hidden = true;
+    $("#plan-status").textContent = "交通連結提供查詢；實際班次、營業與開放狀況請出發前確認。";
+  }
+  function itineraryText() {
+    return "《島遊趣》我的旅行行程\n" + state.itinerary.map((item, i) =>
+      `${i+1}. ${item.name}\n地點：${mapLink(item.name)}` + (i ? `\n從上一站查大眾運輸：${transitLink(state.itinerary[i-1].name, item.name)}` : "")
+    ).join("\n\n") + "\n\n這是依加入順序整理的旅行靈感，並非已驗證的可行路線。跨縣市或離島請分天安排；班次、轉乘、營業與開放狀況請出發前確認。";
+  }
+  function setupPlanner() {
+    $("#place-form").addEventListener("submit", e => {
+      e.preventDefault(); const input = $("#place-name"), name = input.value.trim();
+      if (!name) { input.setCustomValidity("請輸入地點名稱"); input.reportValidity(); return; }
+      if (state.itinerary.length >= 180) { $("#plan-status").textContent = "行程地點已達上限，請先移除部分地點。"; return; }
+      state.itinerary.push({ name: name.slice(0,80), source: "custom" }); input.value = "";
+      renderPlan(); if (!state.busy) saveGame(); input.focus();
+    });
+    $("#place-name").addEventListener("input", e => e.target.setCustomValidity(""));
+    $("#copy-plan").onclick = async () => {
+      const text = itineraryText();
+      try { await navigator.clipboard.writeText(text); $("#plan-status").textContent = "已複製行程，可貼到 LINE 或筆記。"; }
+      catch { const box = $("#plan-fallback"); box.value = text; box.hidden = false; $("#fallback-label").hidden = false; box.focus(); box.select(); $("#plan-status").textContent = "無法自動複製，請手動複製下方文字。"; }
+    };
+    $("#reset-game").onclick = () => {
+      if (state.busy) { $("#save-status").textContent = "請先完成目前回合，再重新開始。"; return; }
+      if (confirm("要重新開始嗎？目前的遊戲進度與行程都會清除，建議先複製行程。")) startGame();
+    };
+    $("#result-plan").onclick = () => { els.result.hidden = true; $("#copy-plan").focus(); };
   }
 
   /* ---------- 啟動 ---------- */
@@ -476,7 +563,9 @@
 
     buildBoard();
     buildDie();
-    startGame();
+    setupPlanner();
+    const restored = restoreGame();
+    if (!restored) startGame();
 
     els.roll.addEventListener("click", takeTurn);
     $("#btn-restart").addEventListener("click", startGame);
@@ -485,6 +574,11 @@
     const realign = () => placeToken(false);
     if ("ResizeObserver" in window) new ResizeObserver(realign).observe(els.board);
     else window.addEventListener("resize", realign);
+
+    if (restored) {
+      if (state.over) finishGame();
+      return;
+    }
 
     // 開場說明卡
     await showCard({

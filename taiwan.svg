@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 150">
+  <!-- 簡化的台灣輪廓（裝飾用） -->
+  <path d="M58 4 L70 10 L80 22 L78 32 L74 42 L76 54 L70 66 L66 80 L64 96 L60 112 L54 128 L46 142 L40 132 L36 118 L30 100 L26 84 L22 70 L16 58 L20 46 L28 34 L38 22 L48 10 Z"
+        fill="#cfe3dc" stroke="#a9c9bd" stroke-width="2" stroke-linejoin="round"/>
+</svg>

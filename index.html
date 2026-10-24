@@ -63,6 +63,25 @@
         </div>
       </section>
 
+      <section class="panel" aria-labelledby="plan-title" id="planner">
+        <h2 id="plan-title">我的旅行行程</h2>
+        <p class="plan-note">蓋章景點會依走訪順序加入；也可以補上想吃、想逛的地點。清單是旅行靈感，跨縣市或離島請分天安排。</p>
+        <form id="place-form" class="place-form">
+          <label for="place-name">自訂地點（建議含縣市）</label>
+          <div class="place-input"><input id="place-name" maxlength="80" placeholder="例如：台中 第二市場" required><button class="btn" type="submit">加入</button></div>
+        </form>
+        <ol id="itinerary" class="itinerary"></ol>
+        <button id="copy-plan" type="button" class="btn">複製行程</button>
+        <p id="plan-status" role="status" class="plan-note"></p>
+        <label for="plan-fallback" id="fallback-label" hidden>請選取以下文字，手動複製行程</label>
+        <textarea id="plan-fallback" rows="7" readonly hidden></textarea>
+      </section>
+      <section class="panel" aria-labelledby="save-title">
+        <h2 id="save-title">旅行存檔</h2>
+        <p id="save-status" role="status" class="plan-note"></p>
+        <p class="plan-note">進度保留在目前瀏覽器。回合中離開，會回到上一個完成的回合；換裝置、清除瀏覽器資料或無痕模式可能無法保留。</p>
+        <button id="reset-game" type="button" class="btn">重新開始</button>
+      </section>
       <section class="panel" aria-labelledby="log-title">
         <h2 id="log-title">旅途紀錄</h2>
         <ol id="log" class="log"></ol>
@@ -114,6 +133,7 @@
       </div>
       <div class="result-actions">
         <button id="btn-restart" class="btn btn-primary" type="button">再玩一次</button>
+        <button id="result-plan" class="btn" type="button">查看／複製行程</button>
         <button id="btn-copy" class="btn" type="button">複製成績</button>
       </div>
       <p id="copy-status" class="copy-status" aria-live="polite"></p>

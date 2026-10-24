@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 180" preserveAspectRatio="xMidYMax slice">
+  <!-- 天空 -->
+  <rect width="1200" height="180" fill="#cfe6ee"/>
+  <circle cx="1010" cy="52" r="26" fill="#f1b72b"/>
+  <!-- 雲 -->
+  <g fill="#fbfdfc" opacity=".85">
+    <ellipse cx="260" cy="38" rx="46" ry="11"/>
+    <ellipse cx="292" cy="30" rx="30" ry="10"/>
+    <ellipse cx="610" cy="26" rx="40" ry="9"/>
+    <ellipse cx="640" cy="19" rx="24" ry="8"/>
+  </g>
+  <!-- 遠山（右側高峰象徵玉山） -->
+  <polygon fill="#9cc5b0" points="0,180 0,128 90,108 170,124 270,102 370,126 470,110 560,130 650,112 730,66 820,28 900,72 980,56 1060,98 1140,84 1200,104 1200,180"/>
+  <!-- 中景山丘 -->
+  <polygon fill="#6f9d4f" points="0,180 0,142 120,124 240,142 360,130 480,146 600,134 700,120 800,98 880,126 960,112 1040,132 1200,120 1200,180"/>
+  <!-- 近景 -->
+  <polygon fill="#3f7a56" points="0,180 0,160 150,148 300,162 450,152 600,164 800,152 1000,162 1200,152 1200,180"/>
+  <!-- 海 -->
+  <rect y="166" width="1200" height="14" fill="#2b8aa0"/>
+  <g fill="none" stroke="#fbfdfc" stroke-width="2" stroke-linecap="round" opacity=".9">
+    <path d="M30 173 q10 -6 20 0 t20 0 t20 0"/>
+    <path d="M210 175 q10 -6 20 0 t20 0 t20 0"/>
+    <path d="M420 172 q10 -6 20 0 t20 0 t20 0"/>
+  </g>
+  <!-- 鐵軌 -->
+  <line x1="560" y1="163" x2="1200" y2="163" stroke="#14304a" stroke-width="3"/>
+  <!-- 觀光列車 -->
+  <g stroke="#14304a" stroke-width="2">
+    <g fill="#fbfdfc">
+      <rect x="640" y="138" width="78" height="23" rx="4"/>
+      <rect x="722" y="138" width="78" height="23" rx="4"/>
+      <rect x="804" y="138" width="78" height="23" rx="4"/>
+      <rect x="886" y="138" width="78" height="23" rx="4"/>
+    </g>
+    <path d="M968 161 V142 q0 -4 4 -4 h58 q22 0 32 23 z" fill="#2b8aa0"/>
+  </g>
+  <g fill="#2b8aa0">
+    <rect x="650" y="144" width="14" height="9" rx="2"/><rect x="670" y="144" width="14" height="9" rx="2"/><rect x="690" y="144" width="14" height="9" rx="2"/>
+    <rect x="732" y="144" width="14" height="9" rx="2"/><rect x="752" y="144" width="14" height="9" rx="2"/><rect x="772" y="144" width="14" height="9" rx="2"/>
+    <rect x="814" y="144" width="14" height="9" rx="2"/><rect x="834" y="144" width="14" height="9" rx="2"/><rect x="854" y="144" width="14" height="9" rx="2"/>
+    <rect x="896" y="144" width="14" height="9" rx="2"/><rect x="916" y="144" width="14" height="9" rx="2"/><rect x="936" y="144" width="14" height="9" rx="2"/>
+  </g>
+  <g fill="#f1b72b">
+    <rect x="640" y="154" width="78" height="4"/><rect x="722" y="154" width="78" height="4"/>
+    <rect x="804" y="154" width="78" height="4"/><rect x="886" y="154" width="78" height="4"/>
+  </g>
+  <rect x="978" y="145" width="30" height="9" rx="2" fill="#fbfdfc"/>
+  <!-- 車輪 -->
+  <g fill="#14304a">
+    <circle cx="660" cy="163" r="4"/><circle cx="700" cy="163" r="4"/><circle cx="742" cy="163" r="4"/><circle cx="782" cy="163" r="4"/>
+    <circle cx="824" cy="163" r="4"/><circle cx="864" cy="163" r="4"/><circle cx="906" cy="163" r="4"/><circle cx="946" cy="163" r="4"/>
+    <circle cx="990" cy="163" r="4"/><circle cx="1030" cy="163" r="4"/>
+  </g>
+</svg>
