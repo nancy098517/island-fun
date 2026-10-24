@@ -117,7 +117,7 @@ $('adv-custom-default').onclick=()=>applyCustom(null);
 renderEditor();
 
 window.IslandAdventure={activate(){active=true;render();loadMap();},deactivate(){active=false;},getSpots:()=>SPOTS.map(p=>({...p}))};
-IslandPlanActions.register('adventure',{sources:['selected','all'],snapshot(source){const list=source==='all'?SPOTS:s.route.map(i=>SPOTS[i]);return{title:city+(source==='all'?'候選景點':'旅行足跡'),origin:s.origin,destination:city,places:list.map(p=>({...p,query:city+' '+p.name})),busy,mapPending:!mapReady,mapCanvas:mapReady?$('adv-map'):null};},replay:restart});
+IslandPlanActions.register('adventure',{sources:['selected','all'],snapshot(source){const list=source==='all'?SPOTS:s.route.map(i=>SPOTS[i]);return{title:city+(source==='all'?'候選景點':'旅行足跡'),origin:s.origin,destination:city,places:list.map(p=>({...p,query:city+' '+p.name})),busy,finished:s.phase==='over',mapPending:!mapReady,mapCanvas:mapReady?$('adv-map'):null};},finish(){if(busy||!s.route.length)return false;s.phase='over';s.target=-1;s.event=null;token=null;save();render();return true;},replay:restart});
 if(document.fonts)document.fonts.ready.then(paint);
 render();
 })();

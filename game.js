@@ -497,7 +497,7 @@
       if (!raw) return false;
       const saved = JSON.parse(raw), s = saved.state;
       if (saved.version !== 1 || !s || !["totalSteps", "money", "travel", "culture", "skip", "turn"].every(k => Number.isSafeInteger(s[k]) && s[k] >= 0)
-        || s.totalSteps > MAX_STEPS || typeof s.over !== "boolean" || s.over !== (s.totalSteps === MAX_STEPS)
+        || s.totalSteps > MAX_STEPS || typeof s.over !== "boolean" || s.over !== (s.totalSteps === MAX_STEPS || s.endedEarly === true)
         || !Array.isArray(s.visited) || !s.visited.every(i => Number.isInteger(i) && BOARD[i]?.type === "spot")
         || !Array.isArray(s.log) || !s.log.every(t => typeof t === "string")
         || !Array.isArray(s.itinerary) || s.itinerary.length > 200 || !s.itinerary.every(t => typeof t.name === "string" && t.name.trim() && t.name.length <= 80 && ["stamp", "custom"].includes(t.source))) return false;
@@ -576,10 +576,10 @@
       if (state.busy) { $("#save-status").textContent = "請先完成目前回合，再重新開始。"; return; }
       if (confirm("要重新開始嗎？目前的遊戲進度與行程都會清除，建議先複製行程。")) startGame();
     };
-    $("#result-plan").onclick = () => { els.result.hidden = true; $("#unified-copy").focus(); };
+    $("#result-plan").onclick = () => { els.result.hidden = true; IslandPlanActions.goPlan(); };
   }
 
-  IslandPlanActions.register('classic',{sources:['selected','all'],snapshot(source){return {title:'環島旅行',origin:'臺北市',destination:'臺灣',places:(source==='all'?BOARD.filter(c=>c.type==='spot'):state?.itinerary||[]).map(x=>({name:x.name,query:x.name+' 台灣'})),busy:state?.busy||false};},replay(){ $("#reset-game").click();}});
+  IslandPlanActions.register('classic',{sources:['selected','all'],snapshot(source){return {title:'環島旅行',origin:'臺北市',destination:'臺灣',places:(source==='all'?BOARD.filter(c=>c.type==='spot'):state?.itinerary||[]).map(x=>({name:x.name,query:x.name+' 台灣'})),busy:state?.busy||false,finished:!!state?.over};},finish(){if(state.busy||!state.itinerary.length)return false;state.over=true;state.endedEarly=true;els.roll.disabled=true;els.hint.textContent='本次行程已結束，可下載或交給 AI 排行程。';saveGame();return true;},replay(){ $("#reset-game").click();}});
   /* ---------- 啟動 ---------- */
 
   let started = false;
@@ -597,7 +597,7 @@
       result: $("#result"),
     });
 
-    document.addEventListener("island:classic", () => { IslandMap.setTrip("島遊趣環島邀約", state.itinerary.map(x=>({name:x.name,query:x.name+" 台灣"}))); IslandMap.show(BOARD[position()].type === "spot" ? BOARD[position()].name + " 台灣" : "台灣", BOARD[position()].type === "spot" ? BOARD[position()].name : "台灣環島"); placeToken(false); if (state.over) finishGame(); });
+    document.addEventListener("island:classic", () => { IslandMap.setTrip("島遊趣環島邀約", state.itinerary.map(x=>({name:x.name,query:x.name+" 台灣"}))); IslandMap.show(BOARD[position()].type === "spot" ? BOARD[position()].name + " 台灣" : "台灣", BOARD[position()].type === "spot" ? BOARD[position()].name : "台灣環島"); placeToken(false); if (state.over && !state.endedEarly) finishGame(); });
     buildBoard();
     buildDie();
     setupPlanner();
@@ -613,7 +613,7 @@
     else window.addEventListener("resize", realign);
 
     if (restored) {
-      if (state.over && !$("#classic-game").hidden) finishGame();
+      if (state.over && !state.endedEarly && !$("#classic-game").hidden) finishGame();
       return;
     }
 

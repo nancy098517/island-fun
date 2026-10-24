@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap">
-  <link rel="stylesheet" href="style.css?v=20261024-20">
-  <link rel="stylesheet" href="adventure.css?v=20261024-20">
+  <link rel="stylesheet" href="style.css?v=20261024-21">
+  <link rel="stylesheet" href="adventure.css?v=20261024-21">
 </head>
 <body>
 
@@ -164,7 +164,7 @@
     </aside>
   </main>
 
-  <section class="explorer" id="unified-plan" aria-labelledby="unified-title"><div class="panel unified-card"><p class="unified-eyebrow" id="unified-mode">行程</p><h2 id="unified-title">Travel Plan</h2><div class="unified-options"><label for="unified-source">使用的內容</label><select id="unified-source"></select><span id="unified-count" role="status"></span><label for="unified-format">圖片尺寸</label><select id="unified-format"><option value="square">方形圖片</option><option value="story">直式圖片</option></select></div><div class="unified-buttons"><button id="unified-copy" class="btn" type="button">複製行程</button><button id="unified-ai" class="btn" type="button" hidden>複製給 AI 排行程</button><button id="unified-gemini" class="btn btn-primary" type="button">複製行程 → 開啟 Gemini</button><button id="unified-download" class="btn" type="button">下載 Travel Plan</button><button id="unified-replay" class="btn" type="button">重玩</button></div><div class="site-url-row"><span>遊戲網址</span><a href="https://nancy098517.github.io/island-fun/" target="_blank" rel="noopener noreferrer">https://nancy098517.github.io/island-fun/</a><button id="unified-share" class="btn" type="button">複製網址</button><p id="site-url-status" role="status"></p><textarea id="site-url-fallback" readonly rows="2" hidden aria-label="手動複製遊戲網址"></textarea></div><p id="unified-format-note" class="plan-note"></p><p id="unified-status" role="status"></p><textarea id="unified-fallback" readonly rows="7" hidden aria-label="手動複製 Travel Plan"></textarea><p class="plan-note"><a href="https://gemini.google.com/app?hl=zh-TW" target="_blank" rel="noopener noreferrer">開啟 Google Gemini</a>，貼上已複製的內容並送出。</p></div></section>
+  <section class="explorer" id="unified-plan" aria-labelledby="unified-title"><div class="panel unified-card"><p class="unified-eyebrow" id="unified-mode">行程</p><h2 id="unified-title">Travel Plan</h2><p id="unified-end-status" class="plan-note" role="status"></p><ol id="unified-place-list" class="unified-place-list"></ol><div class="unified-options"><label for="unified-source">使用的內容</label><select id="unified-source"></select><span id="unified-count" role="status"></span><label for="unified-format">圖片尺寸</label><select id="unified-format"><option value="square">方形圖片</option><option value="story">直式圖片</option></select></div><div class="unified-buttons"><button id="unified-finish" class="btn" type="button">結束行程</button><button id="unified-copy" class="btn" type="button">複製行程</button><button id="unified-ai" class="btn" type="button" hidden>複製給 AI 排行程</button><button id="unified-gemini" class="btn btn-primary" type="button">複製行程 → 開啟 Gemini</button><button id="unified-download" class="btn" type="button">下載 Travel Plan</button><button id="unified-download-text" class="btn" type="button">下載 AI 排程文字</button><button id="unified-replay" class="btn" type="button">重玩</button></div><div class="site-url-row"><span>遊戲網址</span><a href="https://nancy098517.github.io/island-fun/" target="_blank" rel="noopener noreferrer">https://nancy098517.github.io/island-fun/</a><button id="unified-share" class="btn" type="button">複製網址</button><p id="site-url-status" role="status"></p><textarea id="site-url-fallback" readonly rows="2" hidden aria-label="手動複製遊戲網址"></textarea></div><p id="unified-format-note" class="plan-note"></p><p id="unified-status" role="status"></p><textarea id="unified-fallback" readonly rows="7" hidden aria-label="手動複製 Travel Plan"></textarea><p class="plan-note"><a href="https://gemini.google.com/app?hl=zh-TW" target="_blank" rel="noopener noreferrer">開啟 Google Gemini</a>，貼上已複製的內容並送出。</p></div></section>
   <div class="explorer" id="map-area">
     <section id="google-place-map" class="panel google-place-map" aria-labelledby="google-place-title">
       <div class="google-map-heading"><h2 id="google-place-title">📍 Google Maps 地點標示</h2><a id="google-place-external" target="_blank" rel="noopener noreferrer">在 Google Maps 開啟</a></div>
@@ -178,7 +178,7 @@
   </div>
 
   <footer class="footer">
-    島遊趣 · 巷口美食版 2026.10.24-r20
+    島遊趣 · 行程收尾版 2026.10.24-r21
   </footer>
 
   <!-- 景點／事件卡片 -->
@@ -211,25 +211,25 @@
       </div>
       <div class="result-actions">
         <button id="btn-restart" class="btn btn-primary" type="button">重玩</button>
-        <button id="result-plan" class="btn" type="button">查看／複製行程</button>
+        <button id="result-plan" class="btn" type="button">下載／AI 排行程</button>
         <button id="btn-copy" class="btn" type="button">複製成績</button>
       </div>
       <p id="copy-status" class="copy-status" aria-live="polite"></p>
     </div>
   </div>
 
-  <script src="transport.js?v=20261024-20" defer></script>
-  <script src="city-data.js?v=20261024-20" defer></script>
-  <script src="trip-plan.js?v=20261024-20" defer></script>
-  <script src="lunch-data.js?v=20261024-20" defer></script>
-  <script src="community-data.js?v=20261024-20" defer></script>
-  <script src="location-search.js?v=20261024-20" defer></script>
-  <script src="place-map.js?v=20261024-20" defer></script>
-  <script src="plan-actions.js?v=20261024-20" defer></script>
-  <script src="game.js?v=20261024-20" defer></script>
-  <script src="adventure.js?v=20261024-20" defer></script>
-  <script src="explore.js?v=20261024-20" defer></script>
-  <script src="workspace-tabs.js?v=20261024-20" defer></script>
+  <script src="transport.js?v=20261024-21" defer></script>
+  <script src="city-data.js?v=20261024-21" defer></script>
+  <script src="trip-plan.js?v=20261024-21" defer></script>
+  <script src="lunch-data.js?v=20261024-21" defer></script>
+  <script src="community-data.js?v=20261024-21" defer></script>
+  <script src="location-search.js?v=20261024-21" defer></script>
+  <script src="place-map.js?v=20261024-21" defer></script>
+  <script src="plan-actions.js?v=20261024-21" defer></script>
+  <script src="game.js?v=20261024-21" defer></script>
+  <script src="adventure.js?v=20261024-21" defer></script>
+  <script src="explore.js?v=20261024-21" defer></script>
+  <script src="workspace-tabs.js?v=20261024-21" defer></script>
 
 </body>
 </html>
