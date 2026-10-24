@@ -1,0 +1,116 @@
+/* r22：手機以清楚的操作區、整齊欄位和舒適字級呈現。桌面沿用原版。 */
+@media (max-width:700px) {
+  body {font-family:system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;background:#eff4f1;}
+  .masthead {height:112px;border-bottom:0;}
+  .masthead-text {padding:16px;}
+  .masthead h1 {font-size:32px;letter-spacing:.06em;}
+  .masthead p {max-width:290px;font-size:12px;line-height:1.6;margin-top:6px;}
+  .explorer {padding:16px;}
+  #explorer {padding-top:18px;}
+  .mode-picker {gap:10px;padding-bottom:14px;}
+  .mode-picker label {font-size:13px;color:#537267;}
+  .mode-picker select {min-height:48px;border-color:#c2d2c9;border-radius:12px;background:#fff;font-weight:600;}
+  .workspace-tabs {position:sticky;top:0;z-index:9;gap:4px;padding:6px;margin:0 0 14px;border:1px solid #d6e0d9;border-radius:14px;background:#e3ece6;box-shadow:0 4px 12px #254b4808;}
+  .workspace-tabs button {min-height:44px;padding:8px 2px;border:0;border-radius:10px;color:#47655b;font-size:13px;line-height:1.4;}
+  .workspace-tabs button[aria-selected=true] {background:#254b48;color:#fffdf6;border:0;box-shadow:0 2px 5px #254b4818;}
+  .play-instructions {margin-bottom:16px;border-color:#d5dfd5;background:transparent;border-radius:10px;}
+  .play-instructions summary {padding:11px 12px;font-size:13px;min-height:44px;}
+  .play-instructions>div {font-size:14px;}
+  .btn {min-height:44px;border-width:1px;border-radius:12px;box-shadow:0 2px 0 #254b4828;font-family:inherit;font-size:14px;line-height:1.5;padding:10px 14px;}
+  .btn:disabled {box-shadow:none;}
+  input,select,textarea {font-size:16px!important;}
+  select,input:not([type=checkbox]):not([type=radio]) {min-height:44px;}
+  textarea {line-height:1.7;}
+  .plan-note {font-size:13px;line-height:1.8;color:#566e64;}
+  .adventure-game {margin-top:0;font-family:inherit;}
+  .adv-hero {padding:18px;gap:14px;border-radius:18px;background:#254b48;}
+  .adv-hero h2 {font-size:22px;line-height:1.45;letter-spacing:0;}
+  .adv-hero p {font-size:13px;line-height:1.7;margin-top:6px;}
+  .adv-hero .adv-eyebrow {font-size:9px;letter-spacing:.12em;margin:0 0 5px;}
+  .adv-ticket {min-width:0;padding:10px 14px;border-radius:10px;display:grid;grid-template-columns:auto 1fr;column-gap:12px;align-items:center;background:#f4d28c;border-left-width:2px;}
+  .adv-ticket>span {font-size:11px;}
+  .adv-ticket strong {font-size:16px;margin:0;text-align:right;}
+  .adv-ticket small {grid-column:1/-1;font-size:10px;opacity:.8;}
+  .adv-city-bar {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;padding:18px 0;align-items:center;}
+  .adv-city-bar label {font-size:12px;color:#587267;}
+  .adv-city-bar label[for=adv-origin] {grid-column:1;grid-row:1;}
+  .adv-city-bar label[for=adv-city] {grid-column:2;grid-row:1;}
+  #adv-origin {grid-column:1;grid-row:2;}
+  #adv-city {grid-column:2;grid-row:2;}
+  .adv-city-bar select {width:100%;min-width:0;background:#fff;border-color:#c0d1c6;font-size:16px;border-radius:10px;}
+  .adv-city-bar .btn {font-size:13px;padding:9px 8px;margin-top:2px;}
+  #adv-restart {background:transparent;border-color:#c0d1c6;box-shadow:none;}
+  #adv-save {grid-column:1/-1;font-size:12px;line-height:1.7;}
+  #adv-save:empty {display:none;}
+  .adv-hud {gap:6px;margin-bottom:14px;}
+  .adv-hud>div {padding:10px 6px;text-align:center;border:1px solid #d7dfd3;background:#fffdf7;border-radius:12px;}
+  .adv-hud span {font-size:11px;}
+  .adv-hud strong {font-size:18px;line-height:1.4;white-space:nowrap;}
+  .adv-stage {min-height:0;padding:16px;background:#fffdf7;border:1px solid #ccd9cd;border-radius:18px;box-shadow:0 5px 16px #254b4807;}
+  .adv-stage-head {gap:8px;font-size:11px;letter-spacing:0;}
+  .adv-missions {gap:5px;}
+  .adv-missions span {font-size:11px;padding:4px 7px;}
+  .adv-stage-art {height:84px;margin:12px -16px 16px;}
+  .adv-stage-art #adv-scene-icon {font-size:48px;}
+  .adv-stage h3 {font-size:21px;line-height:1.5;margin-bottom:10px;}
+  .adv-stage>p {font-size:14px;line-height:1.85;min-height:0;}
+  .adv-actions {gap:10px;}
+  .adv-actions .btn {flex:1 1 130px;font-size:14px;border-width:1px;}
+  .adv-actions>a.adv-nearby-food {flex-basis:100%;font-size:13px;min-height:44px;}
+  .adv-dice-zone {margin-top:20px;padding-top:16px;}
+  .adv-preferences {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
+  .adv-preferences button {min-height:44px;font-size:12px;padding:8px 3px;border-radius:10px;line-height:1.5;}
+  .adv-roll-row {gap:12px;flex-wrap:wrap;}
+  #adv-die {font-size:44px;}
+  .adv-roll-row .btn {flex:1;font-size:14px;border-width:1px;}
+  .adv-bag {padding:18px;border-radius:16px;background:#e2ebe2;}
+  .adv-bag h3 {font-size:17px;}
+  .adv-bag p,.adv-bag ol {font-size:13px;line-height:1.8;}
+  .adv-bag ul li {font-size:13px;}
+  .trip-finishbar {margin-top:18px;padding-top:16px;}
+  .trip-finishbar>p {font-size:13px;}
+  .trip-finishbar>div {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;}
+  .trip-finishbar .btn {font-size:12px;padding:10px 3px;min-height:44px;}
+  .trip-finishbar>small {font-size:11px;}
+  .ex-heading {margin:8px 0 18px;}
+  .ex-heading h2,.ex-lottery h2 {font-size:26px;line-height:1.4;}
+  .ex-heading p {font-size:14px;line-height:1.8;}
+  .ex-controls {padding:14px;gap:10px;background:#e5ede5;border-color:#d1dfd2;border-radius:14px;}
+  .ex-controls>label {font-size:13px;}
+  .ex-controls>select {flex:1;min-width:0;}
+  .ex-controls select {font-size:16px;border:1px solid #b2c6b8;border-radius:10px;}
+  .ex-controls>.plan-note {flex-basis:100%;margin:0;}
+  .ex-controls .btn {min-height:44px;font-size:13px;}
+  .ex-grid {gap:16px;}
+  .ex-grid>.panel {padding:18px 14px;background:#fffdf7;}
+  .ex-grid h2 {font-size:21px;}
+  .ex-visual {width:min(100%,260px);}
+  .ex-draw-actions {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;}
+  .ex-draw-actions .btn {font-size:12px;padding:10px 3px;}
+  #ex-status {font-size:14px;min-height:1.8em;}
+  .ex-result h3 {font-size:22px;}
+  .ex-map-panel,.ex-lottery {margin-top:0;border-radius:16px;}
+  .workspace-panel>details {padding:16px;border-width:1px;}
+  .workspace-panel .explorer {padding:0;}
+  .workspace-panel h2 {font-size:23px;line-height:1.5;}
+  .adv-custom-row {padding:12px;gap:10px;margin:14px 0;}
+  .adv-custom-row label {font-size:13px;}
+  .adv-custom-row button {grid-column:1/-1;}
+  .adv-map-heading h3 {font-size:23px;margin-bottom:8px;}
+  .adv-map-heading button {min-height:44px;}
+  .adv-stamp-list button {min-height:44px;font-size:12px;}
+  .location-search input {width:100%;min-width:0;flex-basis:100%;border:1px solid #b2c6b8;border-radius:10px;}
+  .location-search .btn {flex:1;}
+  #view-panel-plan .unified-card {padding:18px 16px;border-radius:16px;background:#fffdf7;}
+  .unified-options {display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin:18px 0;}
+  .unified-options label {font-size:12px;margin-top:6px;}
+  .unified-options select {width:100%;min-width:0;background:#fff;border-color:#c2d2c9;}
+  #unified-count {font-size:12px;color:#58736a;}
+  .unified-buttons {gap:10px;}
+  .unified-buttons .btn {font-size:13px;padding:11px 8px;}
+  #unified-gemini {grid-column:1/-1;grid-row:1;min-height:48px;}
+  #unified-replay {background:transparent;border-color:#bdcdc1;box-shadow:none;}
+  .site-url-row {font-size:13px;}
+  .gemini-reminder {font-family:inherit;}
+  .footer {font-size:11px;padding:22px 16px 28px;}
+}
