@@ -489,3 +489,25 @@ body[data-workspace-view]:not([data-workspace-view=play]) #adventure-game,body[d
 .adv-custom-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:12px;border:1px solid #b8c7bc;border-radius:12px;margin:16px 0;padding:12px}.adv-custom-row label{display:flex;flex-direction:column;gap:5px;min-width:0}.adv-custom-row input,.adv-custom-row select{width:100%;min-width:0;padding:10px;border:1px solid #a6b7ac;border-radius:8px;font:inherit;background:white}.adv-custom-row button{align-self:end}
 .location-search{display:flex;gap:10px;flex-wrap:wrap}.location-search input{flex:1;min-width:140px;padding:12px;font:inherit}.location-result{display:block;width:100%;text-align:left;margin:8px 0;padding:12px}.osm-place-canvas{width:100%;height:auto;border-radius:14px}.osm-search-results:empty{display:none}
 @media(max-width:650px){.workspace-tabs{gap:5px}.workspace-tabs button{font-size:13px;padding:12px 3px}.adv-custom-row{grid-template-columns:1fr 1fr}.adv-custom-row label:first-of-type{grid-column:1/-1}}
+
+/* r14：玩法選擇與頁內操作分層。 */
+.ex-modes[hidden]{display:none!important}
+.mode-picker{display:flex;align-items:center;gap:14px;padding:4px 0 18px;color:#254b48}
+.mode-picker label{font-size:14px;font-weight:700;white-space:nowrap}
+.mode-picker select{font:inherit;font-size:16px;color:#254b48;background:#fffdf6;border:1px solid #9cb4ab;border-radius:10px;padding:10px 38px 10px 14px;max-width:100%;min-width:210px}
+#workspace-context{margin-left:auto;font-size:13px;color:#628078}
+.workspace-tabs{display:flex;gap:24px;position:static;padding:0;margin:0 0 22px;border-bottom:1px solid #bdcec5;background:transparent}
+.workspace-tabs button{flex:0 1 auto;border:0;border-bottom:3px solid transparent;border-radius:0;padding:12px 2px;color:#688078;background:transparent;font-size:15px;font-weight:500;box-shadow:none;min-height:46px;white-space:nowrap}
+.workspace-tabs button[aria-selected=true]{background:transparent;color:#254b48;border-bottom-color:#254b48;box-shadow:none;font-weight:700}
+.workspace-tabs button:focus-visible,.mode-picker select:focus-visible{outline:3px solid #c99827;outline-offset:3px}
+body[data-workspace-view]:not([data-workspace-view=play]) #explorer{padding-bottom:0}
+.workspace-panel{margin-top:0;padding-top:0}
+.plan-guide{font-size:14px;color:#58736a;line-height:1.7;margin:0 0 14px;padding:0}
+#view-panel-plan .unified-card{border:1px solid #c2d0c6;border-radius:16px;padding:26px}
+@media(max-width:650px){.mode-picker{gap:10px;flex-wrap:wrap;padding:0 0 12px}.mode-picker select{flex:1;min-width:0}.mode-picker label{font-size:13px}#workspace-context{display:none}.workspace-tabs{gap:0;justify-content:space-between;margin-bottom:16px}.workspace-tabs button{flex:1;font-size:13px;padding:12px 1px}.workspace-panel{padding-top:0}#view-panel-plan .unified-card{padding:18px}.plan-guide{font-size:13px}}
+
+.shop-info{font-size:13px;line-height:1.7;color:#58736a;margin:6px 0 10px;overflow-wrap:anywhere;font-weight:400}.shop-info a{white-space:nowrap}
+
+.ex-train-note:empty{display:none}
+
+.pocket-overview{border-top:1px solid #bdcec5;margin-top:24px;padding:18px 0;color:#254b48;line-height:1.8}.pocket-overview summary{cursor:pointer;font-weight:700}.pocket-overview label{margin-right:12px;font-size:14px}.pocket-overview select{font:inherit;max-width:100%;padding:8px;border:1px solid #9cb4ab;border-radius:8px;margin:16px 0;background:#fffdf6}
