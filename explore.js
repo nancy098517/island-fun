@@ -64,7 +64,7 @@ function render(){
  const countyPick=s.mode==='county'&&!s.county;
  $('ex-county-controls').hidden=s.mode!=='county';$('ex-lunch-controls').hidden=s.mode!=='lunch';
  $('ex-county').value=s.county;
- $('ex-departure').hidden=s.mode==='lunch'||countyPick;$('ex-origin').value=s.origins[routeKey()]||'臺北市';$('ex-origin').disabled=route().length>0;
+ $('ex-departure').hidden=s.mode==='lunch'||countyPick;$('ex-origin').value=s.origins[routeKey()]||'臺北市';$('ex-origin').disabled=busy;
  $('ex-campus').value=s.campus;$('ex-foods').value=(s.custom[routeKey()]||s.lunch).join('\n');
  $('ex-custom-editor').hidden=countyPick||s.mode==='lunch';$('ex-map-places').value=options().map(x=>x.name).join('\n');
  $('ex-title').textContent=s.mode==='lunch'?'今天中午，吃什麼？':countyPick?'突然放假，去哪個縣市？':s.mode==='county'?s.county+'探索地圖':'今天，遊台灣';
@@ -77,11 +77,9 @@ function render(){
  if(s.last){$('ex-result-name').textContent=s.last.name;$('ex-result-transport').textContent=s.last.transport?IslandTransport.text(s.last.transport):'';$('ex-result-map').replaceChildren(markPlace(s.last));}
  const r=route();IslandMap.setTrip(s.mode==='lunch'?'中科大'+s.campus+'午餐邀約':s.mode==='county'&&s.county?s.county+'出遊邀約':'我的台灣旅行邀約',r);$('ex-route-title').textContent=s.mode==='lunch'?s.campus+'午餐抽選紀錄':s.mode==='county'&&s.county?s.county+'旅行路線':'我的台灣旅行路線';
  $('ex-route').replaceChildren(...r.map((x,i)=>{const li=document.createElement('li');const title=document.createElement('strong');title.textContent=x.name;li.append(title);if(x.transport){const note=document.createElement('p');note.className='ex-train-note';note.textContent=IslandTransport.text(x.transport);li.append(note);}const links=document.createElement('div');links.className='ex-route-links';links.append(markPlace(x));const del=document.createElement('button');del.type='button';del.textContent='移除';del.setAttribute('aria-label','移除'+x.name);del.onclick=()=>{if(busy)return;s.routes[routeKey()].splice(i,1);s.last=null;render();persist();};links.append(del);li.append(links);return li;}));
- $('ex-empty').hidden=!!r.length;$('ex-copy').disabled=!r.length;$('ex-clear').disabled=!r.length;
+ $('ex-empty').hidden=!!r.length;$('ex-copy').disabled=!r.length;$('ex-copy-ai').disabled=!r.length;$('ex-clear').disabled=!r.length;
  $('ex-manual-copy').hidden=true;$('ex-manual-label').hidden=true;
  document.querySelectorAll('[data-draw]').forEach(b=>b.disabled=busy||!list.length);
- $('ex-area-map').hidden=countyPick||s.mode==='lunch';
- $('ex-area-map').replaceChildren(makeLink('開啟'+(s.county&&s.mode==='county'?s.county:'台灣')+'地圖',mapURL(s.mode==='county'?s.county:'台灣')));
  if(!busy){$('ex-visual').replaceChildren();drawWheel(list.length?list:[],0);}
 }
 // 加密亂數加上拒絕取樣，避免候選數不是 6 的倍數時偏向某些選項。
@@ -116,10 +114,11 @@ async function draw(method){
   persist();
  } finally {busy=false;document.querySelectorAll('[data-draw]').forEach(b=>b.disabled=!candidates().length);}
 }
-function copyText(){const r=route();return `《島遊趣》${$('ex-route-title').textContent}\n`+r.map((x,i)=>`${i+1}. ${x.name}\n地圖：${mapURL(x.query)}`+(x.transport?'\n交通遊戲卡：'+IslandTransport.text(x.transport):'')).join('\n\n')+'\n\n抽選順序是旅行靈感，未核實距離與可行時間；跨縣市／離島請分天安排。營業與景點開放狀況請出發前確認。';}
+function copyText(){return `Travel Plan｜${$('ex-route-title').textContent}\n出發地：${s.mode==='lunch'?'國立臺中科技大學 '+s.campus:(s.origins[routeKey()]||'臺北市')}\n\n`+route().map((x,i)=>`${i+1}. ${x.name}\n地圖：${mapURL(x.query)}`).join('\n\n')+'\n\n這是想去的地點清單，尚未依距離排序。可按「複製給 AI 排行程」交給 AI 規劃。';}
+function aiText(){return IslandAIPlan.build({origin:s.mode==='lunch'?'國立臺中科技大學 '+s.campus:(s.origins[routeKey()]||'臺北市'),destination:s.mode==='lunch'?'國立臺中科技大學 '+s.campus+'周邊午餐':s.mode==='county'?s.county:'臺灣',places:route()});}
 document.querySelectorAll('[data-ex-mode]').forEach(b=>b.onclick=()=>{if(busy)return;s.mode=b.dataset.exMode;s.last=null;render();persist();setStatus('已切換模式。各模式的行程分開保留。');});
 document.querySelectorAll('[data-draw]').forEach(b=>b.onclick=()=>draw(b.dataset.draw));
-$('ex-origin').replaceChildren(...IslandTransport.COUNTIES.map(x=>new Option(x,x)));$('ex-origin').onchange=e=>{if(busy||route().length){e.target.value=s.origins[routeKey()]||'臺北市';return;}s.origins[routeKey()]=e.target.value;persist();};
+$('ex-origin').replaceChildren(...IslandTransport.COUNTIES.map(x=>new Option(x,x)));$('ex-origin').onchange=e=>{if(busy){e.target.value=s.origins[routeKey()]||'臺北市';return;}const origin=e.target.value;s.origins[routeKey()]=origin;const first=route()[0];if(first){const to=IslandTransport.countyOf(first.query),pool=IslandTransport.choices(origin,to),old=first.transport;first.transport={...(pool.find(t=>t.name===old?.name)||pool[0]),from:origin,to};}s.last=null;render();persist();setStatus('出發地已更新，行程清單保留。');};
 $('ex-county').replaceChildren(new Option('讓遊戲決定縣市',''),...Object.keys(COUNTY).map(x=>new Option(x,x)));$('ex-county').onchange=e=>{if(busy){e.target.value=s.county;return;}s.county=e.target.value;s.last=null;render();persist();setStatus(s.county?'已進入'+s.county+'，選一種玩法抽下一站。':'選一種玩法抽縣市。');};
 $('ex-reroll-county').onclick=()=>{if(busy)return;s.county='';s.last=null;render();persist();setStatus('選骰子、飛鏢或輪盤，重新決定縣市。');};
 $('ex-campus').onchange=e=>{if(busy){e.target.value=s.campus;return;}s.campus=e.target.value;s.last=null;render();persist();};
@@ -128,7 +127,8 @@ $('ex-save-foods').onclick=()=>{if(busy)return;const list=[...new Set($('ex-food
 $('ex-apply-map').onclick=()=>{if(busy)return;const list=[...new Set($('ex-map-places').value.split('\n').map(x=>x.trim()).filter(Boolean))];if(!list.length||list.length>150||list.some(n=>n.length>60)){setStatus('請輸入 1～150 個地點，每行一個，每項最多 60 字。');return;}if(route().length&&!confirm('替換地圖會清除這張地圖的抽選紀錄，是否套用？'))return;s.custom[routeKey()]=list;s.routes[routeKey()]=[];s.last=null;render();persist();setStatus('地圖已替換。接下來只會抽到你輸入的地點。');};
 $('ex-default-map').onclick=()=>{if(busy)return;if(confirm('恢復預設地點並清除此地圖抽選紀錄？')){delete s.custom[routeKey()];s.routes[routeKey()]=[];s.last=null;render();persist();setStatus('已恢復預設地圖。');}};
 $('ex-clear').onclick=()=>{if(busy)return;if(confirm('要清除此地圖的抽選紀錄並重新開始嗎？請先複製需要保留的行程。')){s.routes[routeKey()]=[];s.last=null;render();persist();setStatus('此地圖已重新開始。');}};
-$('ex-copy').onclick=async()=>{const text=copyText();try{await navigator.clipboard.writeText(text);setStatus('行程已複製，可貼到 LINE 或筆記。');}catch{$('ex-manual-copy').value=text;$('ex-manual-copy').hidden=false;$('ex-manual-label').hidden=false;$('ex-manual-copy').focus();$('ex-manual-copy').select();setStatus('請手動複製下方行程文字。');}};
+async function copyRoute(text){try{await navigator.clipboard.writeText(text);setStatus('已複製，可貼到 AI、LINE 或筆記。');}catch{$('ex-manual-copy').value=text;$('ex-manual-copy').hidden=false;$('ex-manual-label').hidden=false;$('ex-manual-copy').focus();$('ex-manual-copy').select();setStatus('請手動複製下方行程文字。');}}
+$('ex-copy').onclick=()=>copyRoute(copyText());$('ex-copy-ai').onclick=()=>copyRoute(aiText());
 
 function renderLottery(){
  $('lottery-values').value=s.lottery.text;$('lottery-count').value=s.lottery.count;

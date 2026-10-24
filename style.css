@@ -461,3 +461,8 @@ h1, h2 { font-family: var(--font-title); font-weight: 400; margin: 0; }
 :root {--font-title:"Island Trip TC","Island Emoji","Microsoft JhengHei",sans-serif;--font-body:"Island Trip TC","Island Emoji","Microsoft JhengHei",sans-serif;}
 
 @font-face {font-family:"Island Emoji";src:url("assets/island-emoji.ttf") format("truetype");font-style:normal;font-weight:400;font-display:swap;}
+.ai-settings-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1.3fr;gap:12px;margin-top:14px;}
+.ai-settings-grid label{font-size:.9rem;display:grid;gap:6px;}
+.ai-settings-grid input,.ai-settings-grid select{font:inherit;width:100%;min-width:0;padding:9px;border:1px solid #9aafb6;border-radius:7px;background:white;color:var(--ink);}
+.ai-plan-settings summary{cursor:pointer;}
+@media(max-width:700px){.ai-settings-grid{grid-template-columns:1fr 1fr;}.ai-settings-grid label:first-child{grid-column:1/-1;}}
