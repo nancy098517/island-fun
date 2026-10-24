@@ -11,7 +11,7 @@ function invite(){const places=trip.places.length?trip.places:[{name:currentName
 async function copy(text){try{await navigator.clipboard.writeText(text);status.textContent='已複製，可以貼給朋友，或放進 FB／IG 貼文。';}catch{const t=document.getElementById('map-copy-fallback');t.value=text;t.hidden=false;document.getElementById('map-copy-fallback-label').hidden=false;t.focus();t.select();status.textContent='請手動複製下方文字。';}}
 document.getElementById('map-copy-link').onclick=()=>copy(link(current));
 document.getElementById('map-copy-invite').onclick=()=>copy(invite());
-document.getElementById('map-share').onclick=async()=>{if(!navigator.share){await copy(invite());return;}try{await navigator.share({title:trip.title,text:invite(),url:link(current)});status.textContent='已交給裝置分享選單。';}catch(e){if(e.name==='AbortError')status.textContent='已取消分享。';else await copy(invite());}};
+document.getElementById('map-share').onclick=()=>copy('https://nancy098517.github.io/island-fun/');
 function wrap(ctx,text,maxWidth){const lines=[];let line='';for(const ch of text){if(ctx.measureText(line+ch).width>maxWidth&&line){lines.push(line);line='';}line+=ch;}if(line)lines.push(line);return lines;}
 document.getElementById('map-download-image').onclick=async()=>{
  try{
