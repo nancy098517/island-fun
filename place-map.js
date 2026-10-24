@@ -3,12 +3,7 @@
 'use strict';
 let current='', currentName='', trip={title:'我的島遊趣旅行',places:[]};
 const box=document.getElementById('google-place-map'),frame=document.getElementById('google-place-frame'),label=document.getElementById('google-place-label'),external=document.getElementById('google-place-external');
-function show(query,name=query){
- if(typeof query!=='string'||!query.trim())query='台灣';
- query=query.trim();currentName=String(name);label.textContent='目前標示：'+name;box.hidden=false;
- external.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query);
- if(current!==query){frame.src='https://www.google.com/maps?q='+encodeURIComponent(query)+'&output=embed&hl=zh-TW';frame.title='Google Maps：'+name;current=query;}
-}
+function show(query,name=query,focus=false){IslandLocations.show(query,name,focus);}
 function setTrip(title,places){trip={title:String(title),places:places.filter(x=>typeof x?.name==='string'&&typeof x?.query==='string').map(x=>({name:x.name,query:x.query}))};}
 const status=document.getElementById('map-share-status');
 const link=q=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);

@@ -528,7 +528,7 @@
       const name = document.createElement("span"); name.textContent = item.name + (item.source === "stamp" ? " · 已蓋章" : " · 自訂"); li.append(name);
       const actions = document.createElement("div"); actions.className = "plan-links";
       function link(label, url) { const a = document.createElement("a"); a.textContent = label; a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer"; actions.append(a); }
-      const marker = document.createElement("button"); marker.type = "button"; marker.textContent = "在地圖標示"; marker.onclick = () => IslandMap.show(item.name + " 台灣", item.name); actions.append(marker);
+      const marker = document.createElement("button"); marker.type = "button"; marker.textContent = "在地圖標示"; marker.onclick = () => IslandMap.show(item.name + " 台灣", item.name,true); actions.append(marker);
       const remove = document.createElement("button"); remove.type = "button"; remove.textContent = "移除"; remove.setAttribute("aria-label", "從行程移除" + item.name);
       remove.onclick = () => { state.itinerary.splice(i, 1); renderPlan(); if (!state.busy) saveGame(); };
       actions.append(remove); li.append(actions); return li;

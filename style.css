@@ -480,3 +480,12 @@ h1, h2 { font-family: var(--font-title); font-weight: 400; margin: 0; }
 .ex-map-panel,.ex-lottery{padding:20px;}
 .ex-heading{color:#254b48;}.ex-controls{border:1px solid #c4d6ca;}.ex-candidates li{border-top-width:3px;background:#e1e9de;}
 @media(max-width:700px){.ex-map-panel,.ex-lottery{padding:16px;}}
+/* 分頁只顯示目前任務，保留各遊戲狀態。 */
+.workspace-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;position:sticky;top:0;z-index:10;background:#e8f1ee;padding:12px 0;margin:0 0 20px}
+.workspace-tabs button{border:2px solid #254b48;border-radius:12px;padding:14px 8px;background:#faf5e8;color:#254b48;font:inherit;font-weight:700;cursor:pointer}
+.workspace-tabs button[aria-selected=true]{background:#254b48;color:#fff8df;box-shadow:0 4px 0 #e8b84e}
+body[data-workspace-view]:not([data-workspace-view=play]) #adventure-game,body[data-workspace-view]:not([data-workspace-view=play]) #ex-play,body[data-workspace-view]:not([data-workspace-view=play]) #ex-lottery,body[data-workspace-view]:not([data-workspace-view=play]) #classic-game{display:none!important}
+.workspace-panel{margin-top:12px}.workspace-panel .explorer{width:100%;margin:0}.workspace-panel>details{background:#faf5e8;padding:24px;border:2px solid #254b48;border-radius:16px}
+.adv-custom-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:12px;border:1px solid #b8c7bc;border-radius:12px;margin:16px 0;padding:12px}.adv-custom-row label{display:flex;flex-direction:column;gap:5px;min-width:0}.adv-custom-row input,.adv-custom-row select{width:100%;min-width:0;padding:10px;border:1px solid #a6b7ac;border-radius:8px;font:inherit;background:white}.adv-custom-row button{align-self:end}
+.location-search{display:flex;gap:10px;flex-wrap:wrap}.location-search input{flex:1;min-width:140px;padding:12px;font:inherit}.location-result{display:block;width:100%;text-align:left;margin:8px 0;padding:12px}.osm-place-canvas{width:100%;height:auto;border-radius:14px}.osm-search-results:empty{display:none}
+@media(max-width:650px){.workspace-tabs{gap:5px}.workspace-tabs button{font-size:13px;padding:12px 3px}.adv-custom-row{grid-template-columns:1fr 1fr}.adv-custom-row label:first-of-type{grid-column:1/-1}}

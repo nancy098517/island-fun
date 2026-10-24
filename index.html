@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap">
-  <link rel="stylesheet" href="style.css?v=20261024-12">
-  <link rel="stylesheet" href="adventure.css?v=20261024-12">
+  <link rel="stylesheet" href="style.css?v=20261024-13">
+  <link rel="stylesheet" href="adventure.css?v=20261024-13">
 </head>
 <body>
 
@@ -29,7 +29,7 @@
       <button data-ex-mode="adventure" type="button">✨ 城市冒險</button>
       <button data-ex-mode="taiwan" type="button">🗺️ 全台抽選</button>
       <button data-ex-mode="county" type="button">📍 縣市抽選</button>
-      <button data-ex-mode="lunch" type="button">🍱 中科大午餐</button>
+      <button data-ex-mode="lunch" type="button">🍱 午餐吃什麼？</button>
       <button data-ex-mode="lottery" type="button">🎟️ 自訂抽籤</button>
       <button data-ex-mode="classic" type="button">🎒 經典環島棋盤</button>
     </nav>
@@ -42,9 +42,9 @@
         <div class="adv-stage-art" aria-hidden="true"><span class="adv-sun"></span><span class="adv-cityline">⌂　♜　⌂　♜　⌂</span><span id="adv-scene-icon">🧳</span></div>
         <h3 id="adv-scene-title"></h3><p id="adv-scene-body"></p><div id="adv-actions" class="adv-actions"></div>
         <div class="adv-dice-zone"><div class="adv-preferences" aria-label="下一站偏好"><button type="button" data-adv-intent="any">🧭 隨興漫遊</button><button type="button" data-adv-intent="food">🍧 想找美食</button><button type="button" data-adv-intent="culture">🏛️ 想看文化</button></div><div class="adv-roll-row"><span id="adv-die" aria-label="骰子">⚀</span><button id="adv-roll" class="btn btn-primary" type="button">擲骰子，下一站 →</button><button id="adv-reroll" class="btn" type="button" hidden>用改票券重擲</button></div></div>
-      </section><aside class="adv-bag"><h3>🎒 旅人的背包</h3><p>用已走訪的景點，接著請 AI 排行程。</p><div class="adv-bag-ai"><button id="adv-bag-ai-copy" class="btn" type="button">複製給 AI 排行程</button><button id="adv-bag-gemini" class="btn btn-primary" type="button">複製並開啟 Gemini</button><a href="https://gemini.google.com/app?hl=zh-TW" target="_blank" rel="noopener noreferrer">已複製？開啟 Google Gemini</a><p id="adv-bag-ai-status" role="status"></p><textarea id="adv-bag-ai-fallback" readonly rows="6" hidden aria-label="手動複製 AI 行程提示"></textarea></div><ul id="adv-inventory"></ul><h3>旅途小記</h3><ol id="adv-log"></ol></aside></div>
+      </section><aside class="adv-bag"><h3>🎒 旅人的背包</h3><p>收好這次的回憶。要排行程，請切換上方「行程分享」。</p><div class="adv-bag-ai" hidden><button id="adv-bag-ai-copy" class="btn" type="button" hidden>複製給 AI 排行程</button><button id="adv-bag-gemini" class="btn btn-primary" type="button">複製行程 → 開啟 Gemini</button><a href="https://gemini.google.com/app?hl=zh-TW" target="_blank" rel="noopener noreferrer">已複製？開啟 Google Gemini</a><p id="adv-bag-ai-status" role="status"></p><textarea id="adv-bag-ai-fallback" readonly rows="6" hidden aria-label="手動複製 AI 行程提示"></textarea></div><ul id="adv-inventory"></ul><h3>旅途小記</h3><ol id="adv-log"></ol></aside></div>
       <section class="adv-map-card"><div class="adv-map-heading"><div><p class="adv-eyebrow">YOUR REAL FOOTPRINTS</p><h3>我的地理足跡</h3></div><button id="adv-map-retry" type="button">重新載入地圖</button></div><canvas id="adv-map" width="960" height="620" role="img" aria-label="城市實際地理位置圖，景點編號及走訪狀態另列於下方"></canvas><p id="adv-map-status" role="status">地圖載入後，可看到所有景點與旅人位置。</p><p class="adv-map-credit">底圖 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>。景點座標參考交通部觀光署開放資料；點位僅供定位，不代表開放或可直接到訪。</p><ul id="adv-stamp-list" class="adv-stamp-list"></ul>
-      <div class="adv-share-row"><select id="adv-share-format" aria-label="分享圖尺寸"><option value="square">FB／IG 方形地圖</option><option value="story">IG 限動地圖</option></select><button id="adv-download" class="btn btn-primary" type="button" disabled>下載 Travel Plan 地圖</button><button id="adv-copy" class="btn" type="button">複製完整行程</button><button id="adv-copy-ai" class="btn" type="button">複製給 AI 排行程</button><button id="adv-gemini" class="btn" type="button">複製並開啟 Gemini</button></div><p id="adv-share-status" role="status"></p><textarea id="adv-share-text" readonly rows="6" hidden aria-label="手動複製行程"></textarea></section>
+      <div class="adv-share-row"><select id="adv-share-format" aria-label="分享圖尺寸"><option value="square">FB／IG 方形地圖</option><option value="story">IG 限動地圖</option></select><button id="adv-download" class="btn btn-primary" type="button" disabled>下載 Travel Plan 地圖</button><button id="adv-copy" class="btn" type="button">複製完整行程</button><button id="adv-copy-ai" class="btn" type="button">複製給 AI 排行程</button><button id="adv-gemini" class="btn" type="button">複製行程 → 開啟 Gemini</button></div><p id="adv-share-status" role="status"></p><textarea id="adv-share-text" readonly rows="6" hidden aria-label="手動複製行程"></textarea></section>
     </section>
     <section id="ex-lottery" class="panel ex-lottery" hidden aria-labelledby="lottery-title">
       <p class="ex-eyebrow">不只旅行，任何選擇都能抽。</p><h2 id="lottery-title">自訂抽籤</h2>
@@ -53,7 +53,7 @@
       <textarea id="lottery-values" rows="9" placeholder="選項一&#10;選項二&#10;選項三"></textarea>
       <div class="lottery-controls"><label for="lottery-count">要抽出幾個？</label><input type="number" id="lottery-count" min="1" max="200" step="1" value="1"><button id="lottery-start" type="button" class="btn btn-primary">開始抽籤</button></div>
       <p id="lottery-status" role="status" aria-live="polite"></p><ol id="lottery-results" class="lottery-results"></ol>
-      <button type="button" id="lottery-copy" class="btn" disabled>複製抽籤結果</button><div class="lottery-ai"><h3>用自訂地點排行程</h3><label for="lottery-ai-source">交給 AI 的地點</label><select id="lottery-ai-source"><option value="result">這次抽出的結果</option><option value="all">全部輸入地點</option></select><div class="ai-action-row"><button id="lottery-copy-ai" type="button" class="btn" disabled>複製給 AI 排行程</button><button id="lottery-gemini" type="button" class="btn btn-primary" disabled>複製並開啟 Gemini</button></div><p class="plan-note">這份清單若是景點或店家，可直接交給 AI 安排行程；地點不明時會請 AI 先確認。</p></div><label id="lottery-copy-label" for="lottery-fallback" hidden>請選取文字手動複製</label><textarea id="lottery-fallback" rows="6" readonly hidden></textarea>
+      <button type="button" id="lottery-copy" class="btn" disabled>複製抽籤結果</button><div class="lottery-ai"><h3>用自訂地點排行程</h3><label for="lottery-ai-source">交給 AI 的地點</label><select id="lottery-ai-source"><option value="result">這次抽出的結果</option><option value="all">全部輸入地點</option></select><div class="ai-action-row"><button id="lottery-copy-ai" type="button" class="btn" disabled>複製給 AI 排行程</button><button id="lottery-gemini" type="button" class="btn btn-primary" disabled>複製行程 → 開啟 Gemini</button></div><p class="plan-note">這份清單若是景點或店家，可直接交給 AI 安排行程；地點不明時會請 AI 先確認。</p></div><label id="lottery-copy-label" for="lottery-fallback" hidden>請選取文字手動複製</label><textarea id="lottery-fallback" rows="6" readonly hidden></textarea>
       <p class="plan-note">每次開始都是新的一輪，所有輸入選項都有機會被選中。輸入、數量與上次結果會保存在此瀏覽器。</p><p id="lottery-save" class="plan-note" role="status"></p>
     </section>
     <div id="ex-play">
@@ -62,9 +62,9 @@
         <label for="ex-county">縣市地圖</label><select id="ex-county"></select><button id="ex-reroll-county" class="btn" type="button">重新抽縣市</button>
       </div>
       <div id="ex-lunch-controls" class="ex-controls" hidden>
-        <label for="ex-campus">中科大校區</label><select id="ex-campus"><option>三民校區</option><option>民生校區</option></select>
+        <label for="ex-campus">學校／校區</label><select id="ex-campus"><option>三民校區</option><option>民生校區</option></select>
         <details><summary>編輯午餐選項（餐點類型或店家）</summary><label for="ex-foods">每行一個選項，最多 40 個</label><textarea id="ex-foods" rows="6"></textarea><button id="ex-save-foods" type="button" class="btn">儲存午餐選項</button> <button id="ex-reset-foods" type="button" class="btn">恢復預設 16 個選項</button></details>
-        <p class="plan-note">預設為 Nancy 提供的店家與餐點選項，名稱依原文保留。地圖連結搜尋所選校區附近；未驗證店家距離與午間營業狀況。</p>
+        <p class="plan-note" id="ex-lunch-note"></p>
       </div>
       <div id="ex-departure" class="ex-controls"><label for="ex-origin">遊戲出發縣市</label><select id="ex-origin"></select><p class="plan-note">可隨時變更出發縣市，第一站交通遊戲卡會同步更新。列車卡不代表實際班次。</p></div>
       <div class="ex-grid"><section class="panel ex-machine">
@@ -76,12 +76,12 @@
         <p id="ex-status" role="status" aria-live="polite">選一種玩法，決定下一站。</p>
       </section><section class="panel">
         <h2 id="ex-route-title"></h2><p id="ex-empty" class="plan-note">抽到景點後，會依順序加入這裡。</p><ol id="ex-route" class="ex-route"></ol>
-        <div class="ex-route-actions"><button id="ex-copy" type="button" class="btn">複製行程</button><button id="ex-copy-ai" type="button" class="btn">複製給 AI 排行程</button><button id="ex-gemini" type="button" class="btn">複製並開啟 Gemini</button><button id="ex-clear" type="button" class="btn">重玩</button></div>
+        <div class="ex-route-actions"><button id="ex-copy" type="button" class="btn">複製行程</button><button id="ex-copy-ai" type="button" class="btn">複製給 AI 排行程</button><button id="ex-gemini" type="button" class="btn">複製行程 → 開啟 Gemini</button><button id="ex-clear" type="button" class="btn">重玩</button></div>
         <label id="ex-manual-label" for="ex-manual-copy" hidden>請選取文字手動複製</label><textarea id="ex-manual-copy" readonly rows="8" hidden></textarea>
         <p id="ex-save" role="status" class="plan-note"></p><p class="plan-note">各縣市、各校區分開保留抽選紀錄。同張地圖不重複抽已加入行程的地點，全部抽完可重新開始。抽選順序未依距離最佳化，跨縣市或離島請分天安排。</p>
       </section></div>
       <section class="panel ex-map-panel"><h2>這張地圖的候選地點</h2><p class="plan-note">這是抽選探索棋盤，非地理位置圖。格子編號對應輪盤區域；實際位置請開啟地圖查詢。</p>
-        <details id="ex-custom-editor"><summary>✏️ 自訂地點</summary><label for="ex-map-places">每行一個地點；套用後會替換整張候選地圖並重新開始此地圖的抽選紀錄。</label><textarea id="ex-map-places" rows="7"></textarea><div class="ex-route-actions"><button id="ex-apply-map" class="btn btn-primary" type="button">套用到這張地圖</button><button id="ex-default-map" class="btn" type="button">恢復預設地點</button><button id="custom-copy-ai" class="btn" type="button">複製自訂地點給 AI</button><button id="custom-gemini" class="btn" type="button">複製並開啟 Gemini</button></div></details>
+        <details id="ex-custom-editor"><summary>✏️ 自訂地點</summary><label for="ex-map-places">每行一個地點；套用後會替換整張候選地圖並重新開始此地圖的抽選紀錄。</label><textarea id="ex-map-places" rows="7"></textarea><div class="ex-route-actions"><button id="ex-apply-map" class="btn btn-primary" type="button">套用到這張地圖</button><button id="ex-default-map" class="btn" type="button">恢復預設地點</button><button id="custom-copy-ai" class="btn" type="button">複製自訂地點給 AI</button><button id="custom-gemini" class="btn" type="button">複製行程 → 開啟 Gemini</button></div></details>
         <ol id="ex-candidate-list" class="ex-candidates"></ol>
       </section>
       <details class="ex-sources"><summary>景點參考與使用提醒</summary><p>預設地點僅供旅行靈感，開放、收費及營業狀況請以各館舍與店家公告為準。</p><a href="https://www.taiwan.net.tw/m1.aspx?sNo=0001016" target="_blank" rel="noopener noreferrer">交通部觀光署景點資訊</a> · <a href="https://www.twtainan.net/zh-tw/shop/consume/1113/" target="_blank" rel="noopener noreferrer">莉莉水果店｜臺南旅遊網</a></details>
@@ -163,7 +163,7 @@
     </aside>
   </main>
 
-  <section class="explorer" id="unified-plan" aria-labelledby="unified-title"><div class="panel unified-card"><p class="unified-eyebrow" id="unified-mode">行程</p><h2 id="unified-title">Travel Plan</h2><div class="unified-options"><label for="unified-source">使用的內容</label><select id="unified-source"></select><span id="unified-count" role="status"></span><label for="unified-format">圖片尺寸</label><select id="unified-format"><option value="square">FB／IG 方形</option><option value="story">IG 限時動態</option></select></div><div class="unified-buttons"><button id="unified-copy" class="btn" type="button">複製行程</button><button id="unified-ai" class="btn" type="button">複製給 AI 排行程</button><button id="unified-gemini" class="btn btn-primary" type="button">複製並開啟 Gemini</button><button id="unified-download" class="btn" type="button">下載 Travel Plan</button><button id="unified-share" class="btn" type="button">分享給朋友</button><button id="unified-replay" class="btn" type="button">重玩</button></div><p id="unified-format-note" class="plan-note"></p><p id="unified-status" role="status"></p><textarea id="unified-fallback" readonly rows="7" hidden aria-label="手動複製 Travel Plan"></textarea><p class="plan-note"><a href="https://gemini.google.com/app?hl=zh-TW" target="_blank" rel="noopener noreferrer">開啟 Google Gemini</a>，貼上已複製的內容並送出。</p></div></section>
+  <section class="explorer" id="unified-plan" aria-labelledby="unified-title"><div class="panel unified-card"><p class="unified-eyebrow" id="unified-mode">行程</p><h2 id="unified-title">Travel Plan</h2><div class="unified-options"><label for="unified-source">使用的內容</label><select id="unified-source"></select><span id="unified-count" role="status"></span><label for="unified-format">圖片尺寸</label><select id="unified-format"><option value="square">FB／IG 方形</option><option value="story">IG 限時動態</option></select></div><div class="unified-buttons"><button id="unified-copy" class="btn" type="button">複製行程</button><button id="unified-ai" class="btn" type="button" hidden>複製給 AI 排行程</button><button id="unified-gemini" class="btn btn-primary" type="button">複製行程 → 開啟 Gemini</button><button id="unified-download" class="btn" type="button">下載 Travel Plan</button><button id="unified-share" class="btn" type="button">分享給朋友</button><button id="unified-replay" class="btn" type="button">重玩</button></div><p id="unified-format-note" class="plan-note"></p><p id="unified-status" role="status"></p><textarea id="unified-fallback" readonly rows="7" hidden aria-label="手動複製 Travel Plan"></textarea><p class="plan-note"><a href="https://gemini.google.com/app?hl=zh-TW" target="_blank" rel="noopener noreferrer">開啟 Google Gemini</a>，貼上已複製的內容並送出。</p></div></section>
   <div class="explorer" id="map-area">
     <section id="google-place-map" class="panel google-place-map" aria-labelledby="google-place-title">
       <div class="google-map-heading"><h2 id="google-place-title">📍 Google Maps 地點標示</h2><a id="google-place-external" target="_blank" rel="noopener noreferrer">在 Google Maps 開啟</a></div>
@@ -171,14 +171,13 @@
       <iframe id="google-place-frame" title="Google Maps 地點" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
       <div class="map-share-actions"><button id="map-copy-link" class="btn" type="button">複製地圖連結</button><button id="map-copy-invite" class="btn" type="button">複製邀約文字</button><button id="map-share" class="btn" type="button">分享給朋友</button></div>
       <div class="map-share-actions"><label for="share-image-format">Travel Plan 分享圖</label><select id="share-image-format"><option value="square">FB／IG 方形貼文</option><option value="story">IG 限時動態</option></select><button id="map-download-image" class="btn" type="button">下載 Travel Plan PNG</button></div><p id="map-share-status" role="status"></p><label id="map-copy-fallback-label" for="map-copy-fallback" hidden>請選取文字手動複製</label><textarea id="map-copy-fallback" readonly rows="6" hidden></textarea>
-      <p class="plan-note">分享圖是行程卡，不含 Google 地圖截圖。發文時可另外貼上邀約文字與地圖連結。</p>
-      <p class="plan-note">抽到地點會在這張地圖標示；點清單中的地點可切換查看。一次查看一個地點，不繪製交通路線。店名可能有同名或分店，請確認標示是否正確。</p>
+      <p class="plan-note">此模式的分享圖是文字行程卡。發文時可另外貼上邀約文字與地圖連結。</p>
+      <p class="plan-note">按「在地圖標示」可查詢店家；選取正確分店後，以 OpenStreetMap 底圖標示。若查不到，請改用完整地址。一次查看一個地點。</p>
     </section>
   </div>
 
-  <section class="explorer" aria-labelledby="ai-settings-title"><details class="panel ai-plan-settings"><summary id="ai-settings-title">AI 行程設定（選填）</summary><p class="plan-note">填好後，按遊戲中的「複製給 AI 排行程」，再貼到你使用的 AI。未填詳細出發地時，會帶入遊戲所選的出發縣市。</p><p class="plan-note"><a href="https://gemini.google.com/app?hl=zh-TW" target="_blank" rel="noopener noreferrer">開啟 Google Gemini</a>：將已複製的內容貼上並送出；尚未登入時依 Gemini 畫面操作。這不是 Google 搜尋框。</p><div class="ai-settings-grid"><label>詳細出發地<input id="ai-plan-start" maxlength="120" placeholder="例如：台中車站／中科大三民校區"></label><label>旅行天數<input id="ai-plan-days" type="number" min="1" max="14" step="1" value="1"></label><label>每日出發時間<input id="ai-plan-time" type="time" value="09:00"></label><label>交通偏好<select id="ai-plan-transport"><option>大眾運輸</option><option>自行開車</option><option>步行為主</option><option>請 AI 建議</option></select></label></div></details></section>
   <footer class="footer">
-    島遊趣 · 統一介面版 2026.10.24-r12
+    島遊趣 · 分頁自訂版 2026.10.24-r13
   </footer>
 
   <!-- 景點／事件卡片 -->
@@ -218,14 +217,17 @@
     </div>
   </div>
 
-  <script src="transport.js?v=20261024-12" defer></script>
-  <script src="city-data.js?v=20261024-12" defer></script>
-  <script src="trip-plan.js?v=20261024-12" defer></script>
-  <script src="place-map.js?v=20261024-12" defer></script>
-  <script src="plan-actions.js?v=20261024-12" defer></script>
-  <script src="game.js?v=20261024-12" defer></script>
-  <script src="adventure.js?v=20261024-12" defer></script>
-  <script src="explore.js?v=20261024-12" defer></script>
+  <script src="transport.js?v=20261024-13" defer></script>
+  <script src="city-data.js?v=20261024-13" defer></script>
+  <script src="trip-plan.js?v=20261024-13" defer></script>
+  <script src="lunch-data.js?v=20261024-13" defer></script>
+  <script src="location-search.js?v=20261024-13" defer></script>
+  <script src="place-map.js?v=20261024-13" defer></script>
+  <script src="plan-actions.js?v=20261024-13" defer></script>
+  <script src="game.js?v=20261024-13" defer></script>
+  <script src="adventure.js?v=20261024-13" defer></script>
+  <script src="explore.js?v=20261024-13" defer></script>
+  <script src="workspace-tabs.js?v=20261024-13" defer></script>
 
 </body>
 </html>
