@@ -521,6 +521,7 @@
   }
   const mapLink = name => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(name + " 台灣");
   function renderPlan() {
+    if(window.IslandPlanActions)IslandPlanActions.refresh();
     if (!$("#classic-game").hidden) IslandMap.setTrip("島遊趣環島邀約", state.itinerary.map(x => ({name:x.name,query:x.name+" 台灣"})));
     $("#itinerary").replaceChildren(...state.itinerary.map((item, i) => {
       const li = document.createElement("li");
@@ -575,9 +576,10 @@
       if (state.busy) { $("#save-status").textContent = "請先完成目前回合，再重新開始。"; return; }
       if (confirm("要重新開始嗎？目前的遊戲進度與行程都會清除，建議先複製行程。")) startGame();
     };
-    $("#result-plan").onclick = () => { els.result.hidden = true; $("#copy-plan").focus(); };
+    $("#result-plan").onclick = () => { els.result.hidden = true; $("#unified-copy").focus(); };
   }
 
+  IslandPlanActions.register('classic',{sources:['selected','all'],snapshot(source){return {title:'環島旅行',origin:'臺北市',destination:'臺灣',places:(source==='all'?BOARD.filter(c=>c.type==='spot'):state?.itinerary||[]).map(x=>({name:x.name,query:x.name+' 台灣'})),busy:state?.busy||false};},replay(){ $("#reset-game").click();}});
   /* ---------- 啟動 ---------- */
 
   let started = false;

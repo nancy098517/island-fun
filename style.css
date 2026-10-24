@@ -466,3 +466,17 @@ h1, h2 { font-family: var(--font-title); font-weight: 400; margin: 0; }
 .ai-settings-grid input,.ai-settings-grid select{font:inherit;width:100%;min-width:0;padding:9px;border:1px solid #9aafb6;border-radius:7px;background:white;color:var(--ink);}
 .ai-plan-settings summary{cursor:pointer;}
 @media(max-width:700px){.ai-settings-grid{grid-template-columns:1fr 1fr;}.ai-settings-grid label:first-child{grid-column:1/-1;}}
+.ai-action-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;}
+.lottery-ai{margin-top:24px;border-top:1px dashed #b7c9c1;padding-top:16px;}
+.lottery-ai h3{font-size:1.1rem;}.lottery-ai select{max-width:100%;padding:10px;border:1px solid #557970;border-radius:8px;font:inherit;background:white;color:var(--ink);}
+/* 全模式使用同一組操作列；保留舊元件僅供相容事件，不再呈現分散按鈕。 */
+.ex-route-actions:has(#ex-copy),.adv-share-row,.map-share-actions,.lottery-ai,#lottery-copy,#custom-copy-ai,#custom-gemini,#copy-plan,#reset-game{display:none !important;}
+#unified-plan{padding-top:0;}.unified-card{border-color:#31564e;background:#faf5e8;padding:22px;}.unified-eyebrow{font-size:12px;letter-spacing:.08em;color:#426b5a;margin:0 0 5px;}.unified-card h2{font-size:28px;}.unified-options{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:16px 0;}.unified-options label,.unified-options span{font-size:13px;}.unified-options select{font:inherit;max-width:100%;padding:9px;border:1px solid #9aaa99;border-radius:8px;background:white;color:#254b48;}.unified-buttons{display:flex;gap:12px;flex-wrap:wrap;}.unified-buttons .btn{font-size:14px;padding:.6em 1.1em;}#unified-status{font-size:13px;line-height:1.7;min-height:1.6em;}
+@media(max-width:700px){.unified-card{padding:16px;}.unified-buttons{display:grid;grid-template-columns:1fr 1fr;}.unified-buttons .btn{padding:.65em .7em;font-size:12px;}}
+/* 統一各模式的視覺語言，玩法與資料仍各自保留。 */
+:root{--ink:#254b48;--bg:#e8f1ee;--paper:#faf5e8;}
+.btn{border-width:2px;border-color:#254b48;box-shadow:0 3px 0 #254b48;color:#254b48;}
+.ex-grid .panel,.ex-map-panel,.ex-lottery,.side .panel,.google-place-map{background:#faf5e8;border:1px solid #b9c9bb;border-radius:18px;}
+.ex-map-panel,.ex-lottery{padding:20px;}
+.ex-heading{color:#254b48;}.ex-controls{border:1px solid #c4d6ca;}.ex-candidates li{border-top-width:3px;background:#e1e9de;}
+@media(max-width:700px){.ex-map-panel,.ex-lottery{padding:16px;}}

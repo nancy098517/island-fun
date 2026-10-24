@@ -56,6 +56,7 @@ function setStatus(t){$('ex-status').textContent=t;}
 function markPlace(x){const b=document.createElement('button');b.type='button';b.textContent='在地圖標示';b.onclick=()=>IslandMap.show(x.query,x.name);return b;}
 function makeLink(label,url){const a=document.createElement('a');a.textContent=label;a.href=url;a.target='_blank';a.rel='noopener noreferrer';return a;}
 function render(){
+ if(window.IslandPlanActions)IslandPlanActions.setMode(s.mode);
  document.querySelectorAll('[data-ex-mode]').forEach(b=>{const on=b.dataset.exMode===s.mode;b.setAttribute('aria-pressed',String(on));});
  $('classic-game').hidden=s.mode!=='classic';$('ex-play').hidden=['adventure','classic','lottery'].includes(s.mode);$('ex-lottery').hidden=s.mode!=='lottery';
  $('adventure-game').hidden=s.mode!=='adventure';if(s.mode==='adventure'){IslandMap.hide();IslandAdventure.activate();return;}IslandAdventure.deactivate();
@@ -77,7 +78,7 @@ function render(){
  if(s.last){$('ex-result-name').textContent=s.last.name;$('ex-result-transport').textContent=s.last.transport?IslandTransport.text(s.last.transport):'';$('ex-result-map').replaceChildren(markPlace(s.last));}
  const r=route();IslandMap.setTrip(s.mode==='lunch'?'中科大'+s.campus+'午餐邀約':s.mode==='county'&&s.county?s.county+'出遊邀約':'我的台灣旅行邀約',r);$('ex-route-title').textContent=s.mode==='lunch'?s.campus+'午餐抽選紀錄':s.mode==='county'&&s.county?s.county+'旅行路線':'我的台灣旅行路線';
  $('ex-route').replaceChildren(...r.map((x,i)=>{const li=document.createElement('li');const title=document.createElement('strong');title.textContent=x.name;li.append(title);if(x.transport){const note=document.createElement('p');note.className='ex-train-note';note.textContent=IslandTransport.text(x.transport);li.append(note);}const links=document.createElement('div');links.className='ex-route-links';links.append(markPlace(x));const del=document.createElement('button');del.type='button';del.textContent='移除';del.setAttribute('aria-label','移除'+x.name);del.onclick=()=>{if(busy)return;s.routes[routeKey()].splice(i,1);s.last=null;render();persist();};links.append(del);li.append(links);return li;}));
- $('ex-empty').hidden=!!r.length;$('ex-copy').disabled=!r.length;$('ex-copy-ai').disabled=!r.length;$('ex-clear').disabled=!r.length;
+ $('ex-empty').hidden=!!r.length;$('ex-copy').disabled=!r.length;$('ex-copy-ai').disabled=!r.length;$('ex-gemini').disabled=!r.length;$('ex-clear').disabled=!r.length;
  $('ex-manual-copy').hidden=true;$('ex-manual-label').hidden=true;
  document.querySelectorAll('[data-draw]').forEach(b=>b.disabled=busy||!list.length);
  if(!busy){$('ex-visual').replaceChildren();drawWheel(list.length?list:[],0);}
@@ -128,14 +129,20 @@ $('ex-apply-map').onclick=()=>{if(busy)return;const list=[...new Set($('ex-map-p
 $('ex-default-map').onclick=()=>{if(busy)return;if(confirm('恢復預設地點並清除此地圖抽選紀錄？')){delete s.custom[routeKey()];s.routes[routeKey()]=[];s.last=null;render();persist();setStatus('已恢復預設地圖。');}};
 $('ex-clear').onclick=()=>{if(busy)return;if(confirm('要清除此地圖的抽選紀錄並重新開始嗎？請先複製需要保留的行程。')){s.routes[routeKey()]=[];s.last=null;render();persist();setStatus('此地圖已重新開始。');}};
 async function copyRoute(text){try{await navigator.clipboard.writeText(text);setStatus('已複製，可貼到 AI、LINE 或筆記。');}catch{$('ex-manual-copy').value=text;$('ex-manual-copy').hidden=false;$('ex-manual-label').hidden=false;$('ex-manual-copy').focus();$('ex-manual-copy').select();setStatus('請手動複製下方行程文字。');}}
-$('ex-copy').onclick=()=>copyRoute(copyText());$('ex-copy-ai').onclick=()=>copyRoute(aiText());
+$('ex-copy').onclick=()=>copyRoute(copyText());$('ex-copy-ai').onclick=()=>copyRoute(aiText());$('ex-gemini').onclick=()=>IslandAIPlan.copy({text:aiText(),gemini:true,statusId:'ex-status',fallbackId:'ex-manual-copy',labelId:'ex-manual-label'});
 
+function lotteryPlaces(){return $('lottery-ai-source').value==='all'?[...new Set($('lottery-values').value.split('\n').map(x=>x.trim()).filter(Boolean))]:s.lottery.result;}
+function updateLotteryAI(){const list=lotteryPlaces(),valid=list.length>0&&list.length<=200&&list.every(x=>x.length<=80);$('lottery-copy-ai').disabled=!valid;$('lottery-gemini').disabled=!valid;}
+function lotteryAI(gemini){const names=lotteryPlaces();if(!names.length)return;return IslandAIPlan.copy({text:IslandAIPlan.build({origin:'待確認，請先詢問我',destination:'依自訂地點確認，可能跨縣市',places:names.map(name=>({name,query:name+' 台灣'}))}),gemini,statusId:'lottery-status',fallbackId:'lottery-fallback',labelId:'lottery-copy-label'});}
+$('lottery-ai-source').onchange=updateLotteryAI;$('lottery-copy-ai').onclick=()=>lotteryAI(false);$('lottery-gemini').onclick=()=>lotteryAI(true);
+function customAI(gemini){const names=[...new Set($('ex-map-places').value.split('\n').map(x=>x.trim()).filter(Boolean))];if(!names.length||names.length>150||names.some(x=>x.length>60)){setStatus('請先輸入 1～150 個自訂地點，每行一個，每項最多 60 字。');return;}return IslandAIPlan.copy({text:IslandAIPlan.build({origin:s.origins[routeKey()]||'臺北市',destination:s.mode==='county'?s.county:'臺灣',places:names.map(name=>({name,query:(s.mode==='county'?s.county+' ':'')+name}))}),gemini,statusId:'ex-status',fallbackId:'ex-manual-copy',labelId:'ex-manual-label'});}
+$('custom-copy-ai').onclick=()=>customAI(false);$('custom-gemini').onclick=()=>customAI(true);
 function renderLottery(){
  $('lottery-values').value=s.lottery.text;$('lottery-count').value=s.lottery.count;
  $('lottery-results').replaceChildren(...s.lottery.result.map(x=>{const li=document.createElement('li');li.textContent=x;return li;}));
- $('lottery-copy').disabled=!s.lottery.result.length;$('lottery-fallback').hidden=true;$('lottery-copy-label').hidden=true;
+ $('lottery-copy').disabled=!s.lottery.result.length;updateLotteryAI();$('lottery-fallback').hidden=true;$('lottery-copy-label').hidden=true;
 }
-$('lottery-values').addEventListener('input',()=>{s.lottery.text=$('lottery-values').value.slice(0,20000);s.lottery.result=[];$('lottery-results').replaceChildren();$('lottery-copy').disabled=true;$('lottery-fallback').hidden=true;$('lottery-copy-label').hidden=true;$('lottery-status').textContent='選項已更新，請開始新一輪抽籤。';persist();});
+$('lottery-values').addEventListener('input',()=>{s.lottery.text=$('lottery-values').value.slice(0,20000);s.lottery.result=[];$('lottery-results').replaceChildren();$('lottery-copy').disabled=true;$('lottery-fallback').hidden=true;$('lottery-copy-label').hidden=true;$('lottery-status').textContent='選項已更新，請開始新一輪抽籤。';updateLotteryAI();persist();});
 $('lottery-count').addEventListener('input',()=>{const n=Number($('lottery-count').value);if(Number.isInteger(n)&&n>=1&&n<=200){s.lottery.count=n;persist();}});
 $('lottery-start').onclick=async()=>{
  if(busy)return;const raw=$('lottery-values').value;const list=[...new Set(raw.split('\n').map(x=>x.trim()).filter(Boolean))];const count=Number($('lottery-count').value);
@@ -147,5 +154,9 @@ $('lottery-start').onclick=async()=>{
 };
 $('lottery-copy').onclick=async()=>{const text='《島遊趣》抽籤結果\n'+s.lottery.result.map((x,i)=>`${i+1}. ${x}`).join('\n');try{await navigator.clipboard.writeText(text);$('lottery-status').textContent='抽籤結果已複製。';}catch{$('lottery-fallback').value=text;$('lottery-fallback').hidden=false;$('lottery-copy-label').hidden=false;$('lottery-fallback').focus();$('lottery-fallback').select();$('lottery-status').textContent='請手動複製下方結果。';}};
 
+for(const mode of ['taiwan','county','lunch'])IslandPlanActions.register(mode,{sources:mode==='lunch'?['selected','all','custom']:['selected','all','custom'],snapshot(source){let list=source==='selected'?route():options();if(source==='custom'){const text=mode==='lunch'?$('ex-foods').value:$('ex-map-places').value;list=[...new Set(text.split('\n').map(x=>x.trim()).filter(Boolean))].map(name=>({name,query:mode==='lunch'?'國立臺中科技大學 '+s.campus+' 附近 '+name:(s.county&&mode==='county'?s.county+' ':'')+name}));}return{title:mode==='lunch'?'中科大'+s.campus+'午餐':mode==='county'?s.county+'旅行':'台灣旅行',origin:mode==='lunch'?'國立臺中科技大學 '+s.campus:(s.origins[routeKey()]||'臺北市'),destination:mode==='county'?s.county:mode==='lunch'?'中科大'+s.campus+'周邊':'臺灣',places:list,busy};},replay(){ $('ex-clear').click();}});
+IslandPlanActions.register('lottery',{sources:['selected','all'],snapshot(source){const names=source==='all'?[...new Set($('lottery-values').value.split('\n').map(x=>x.trim()).filter(Boolean))]:s.lottery.result;return{title:'自訂清單',origin:'待確認，請先詢問我',destination:'依自訂地點確認',places:names.map(name=>({name,query:name+' 台灣'})),busy};},replay(){if(busy)return;s.lottery.result=[];renderLottery();persist();$('lottery-status').textContent='已重玩，輸入選項保留，可再次開始抽籤。';}});
+for(const id of ['ex-map-places','ex-foods','lottery-values'])$(id).addEventListener('input',()=>IslandPlanActions.refresh());
+const refreshPlan=()=>IslandPlanActions.refresh();document.addEventListener('click',()=>setTimeout(refreshPlan,0));
 render();persist();
 })();

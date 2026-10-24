@@ -18,3 +18,6 @@
 .adventure-game {font-family:"Island Trip TC",var(--font-body);}
 
 .adv-stage-art #adv-scene-icon {font-family:"Island Emoji",var(--font-body);}
+.adv-bag-ai{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 20px;}.adv-bag-ai .btn{font-size:12px;padding:.55em .9em;border-width:2px;}.adv-bag-ai p{width:100%;font-size:12px;line-height:1.7;margin:0;}
+
+.adv-bag-ai a{font-size:12px;width:100%;color:#27666d;}
