@@ -27,9 +27,9 @@ const COUNTY = {
 };
 const KEY='island-fun-explore-v2';
 const $=id=>document.getElementById(id);
-const MODES=['taiwan','county','lunch','lottery','classic'];
+const MODES=['adventure','taiwan','county','lunch','lottery','classic'];
 const DEFAULT_LUNCH=['礁溪柯家蔥油餅', '熹湯舖子', '好家木瓜牛奶', '縱卝公滷', '京燉滷味', '健身舒肥水煮餐盒', '泓維便當店', 'cama', '露易莎', '星巴克', '蓮尾一鳴 豚骨拉麵專門店', '春水堂', '童話樹簡餐廳', '麥當勞', 'Subway', 'Sukiya'];
-let s={mode:'taiwan',county:'',campus:'三民校區',routes:{},origins:{},custom:{},lunch:DEFAULT_LUNCH, lunchRevision:2, lottery:{text:'',count:1,result:[]},last:null};
+let s={mode:'adventure',county:'',campus:'三民校區',routes:{},origins:{},custom:{},lunch:DEFAULT_LUNCH, lunchRevision:2, lottery:{text:'',count:1,result:[]},last:null};
 let busy=false;
 try {
  const v=JSON.parse(localStorage.getItem(KEY));
@@ -39,6 +39,7 @@ if (!s.custom || typeof s.custom !== 'object' || Array.isArray(s.custom) || !Obj
 if(s.lunchRevision!==2){s.lunch=DEFAULT_LUNCH;s.lunchRevision=2;}
 if(!s.lottery || typeof s.lottery.text!=='string'||s.lottery.text.length>20000||!Number.isInteger(s.lottery.count)||s.lottery.count<1||s.lottery.count>200||!Array.isArray(s.lottery.result)||s.lottery.result.length>200||!s.lottery.result.every(x=>typeof x==='string'&&x.length<=80))s.lottery={text:'',count:1,result:[]};
 if(!s.origins||typeof s.origins!=='object'||Array.isArray(s.origins)||!Object.values(s.origins).every(x=>IslandTransport.COUNTIES.includes(x)))s.origins={};
+if(!s.adventureIntro){s.mode='adventure';s.adventureIntro=true;}
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(s));$('ex-save').textContent='選擇與各地圖行程已儲存在此瀏覽器。';$('lottery-save').textContent='抽籤設定與上次結果已儲存。';}catch{$('ex-save').textContent='目前無法儲存，離開前請先複製行程。';$('lottery-save').textContent='目前無法儲存，請先複製抽籤結果。';}}
 const routeKey=()=>s.mode==='county'?'county:'+s.county:s.mode==='lunch'?'lunch:'+s.campus:'taiwan';
 const route=()=>s.routes[routeKey()] || [];
@@ -56,7 +57,8 @@ function markPlace(x){const b=document.createElement('button');b.type='button';b
 function makeLink(label,url){const a=document.createElement('a');a.textContent=label;a.href=url;a.target='_blank';a.rel='noopener noreferrer';return a;}
 function render(){
  document.querySelectorAll('[data-ex-mode]').forEach(b=>{const on=b.dataset.exMode===s.mode;b.setAttribute('aria-pressed',String(on));});
- $('classic-game').hidden=s.mode!=='classic';$('ex-play').hidden=['classic','lottery'].includes(s.mode);$('ex-lottery').hidden=s.mode!=='lottery';
+ $('classic-game').hidden=s.mode!=='classic';$('ex-play').hidden=['adventure','classic','lottery'].includes(s.mode);$('ex-lottery').hidden=s.mode!=='lottery';
+ $('adventure-game').hidden=s.mode!=='adventure';if(s.mode==='adventure'){IslandMap.hide();IslandAdventure.activate();return;}IslandAdventure.deactivate();
  if(s.mode==='lottery'){IslandMap.hide();renderLottery();return;}
  if(s.mode==='classic'){document.dispatchEvent(new Event('island:classic'));return;}
  const countyPick=s.mode==='county'&&!s.county;

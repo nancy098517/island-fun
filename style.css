@@ -454,3 +454,10 @@ h1, h2 { font-family: var(--font-title); font-weight: 400; margin: 0; }
 #map-share-status {font-size:.9rem;min-height:1.5em;}
 
 @font-face {font-family:"Island Trip TC";src:url("assets/island-trip-tc.ttf") format("truetype");font-style:normal;font-weight:400;font-display:swap;}
+
+#map-area { padding-top:0; }
+#map-area:has(#google-place-map[hidden]) { display:none; }
+
+:root {--font-title:"Island Trip TC","Island Emoji","Microsoft JhengHei",sans-serif;--font-body:"Island Trip TC","Island Emoji","Microsoft JhengHei",sans-serif;}
+
+@font-face {font-family:"Island Emoji";src:url("assets/island-emoji.ttf") format("truetype");font-style:normal;font-weight:400;font-display:swap;}

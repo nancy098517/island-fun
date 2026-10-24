@@ -1,0 +1,89 @@
+/* 全縣市旅行冒險：地理底圖 © OpenStreetMap contributors，連線載入可見範圍圖磚。 */
+(() => {
+'use strict';
+const $=id=>document.getElementById(id);
+let city='臺南市';try{const saved=localStorage.getItem('island-fun-adventure-city');if(Object.hasOwn(IslandCities,saved))city=saved;}catch{}
+let KEY='island-fun-city-adventure-v1:'+city;
+let SPOTS=IslandCities[city].map(p=>({...p}));
+const TRAINS=[{name:'新自強號',icon:'🚆',note:'獲得 1 張改票券，可以重擲一次。',reroll:1,max:6},{name:'鳴日號',icon:'🚂',note:'慢慢看風景，好心情 +2。',mood:2,max:6},{name:'高鐵・左營以北西部區間',icon:'🚄',note:'節省遊戲時間，多玩 1 回合。高雄端為左營站，下車後另行接駁。',max:7}];
+TRAINS.push({name:'在地公車／步行',icon:'🚌',note:'慢慢看城市，好心情 +1。',mood:1,max:6},{name:'海空交通＋在地接駁',icon:'⛴️',note:'離島探索獲得 1 張改票券；請另查真實航線。',reroll:1,max:6},{name:'公路接駁',icon:'🚌',note:'沿途多看一點風景，好心情 +1。',mood:1,max:6});
+function trainPool(){return IslandTransport.choices('臺北市',city).map(t=>t.name.includes('新自強')?0:t.name==='鳴日號'?1:t.name==='台灣高鐵'?2:t.name.includes('海空')?4:t.name==='公路接駁'?5:3);}
+const random=n=>{const a=new Uint32Array(1),lim=Math.floor(4294967296/n)*n;do{crypto.getRandomValues(a);}while(a[0]>=lim);return a[0]%n;};
+const fresh=()=>({phase:'ready',money:500,mood:3,food:0,culture:0,visited:[],inventory:[],route:[],turn:0,max:6,train:null,reroll:0,current:-1,target:-1,die:1,intent:'any',event:null,log:['突然放假了。今天，把'+city+'走成自己的故事。']});
+let s=fresh(),busy=false,active=false,mapReady=false,mapPromise=null,base=null,token=null,revision=0;
+function restore(){s=fresh();try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&['ready','train','travel','stop','event','over'].includes(v.phase)&&['money','mood','food','culture','turn','max','reroll'].every(k=>Number.isInteger(v[k])&&v[k]>=0)&&v.max>=6&&v.max<=7&&v.turn<=v.max&&Array.isArray(v.visited)&&new Set(v.visited).size===v.visited.length&&v.visited.every(i=>Number.isInteger(i)&&i>=0&&i<SPOTS.length)&&Array.isArray(v.route)&&v.route.every(i=>v.visited.includes(i))&&Array.isArray(v.inventory)&&v.inventory.every(x=>typeof x==='string'&&x.length<80)&&Array.isArray(v.log)&&v.log.every(x=>typeof x==='string'&&x.length<300)&&['any','food','culture'].includes(v.intent)&&Number.isInteger(v.current)&&v.current>=-1&&v.current<8&&Number.isInteger(v.target)&&v.target>=-1&&v.target<8&&(v.train===null||Number.isInteger(v.train)&&v.train>=0&&v.train<TRAINS.length)&&(!['train','travel','stop','event'].includes(v.phase)||v.train!==null)&&(v.phase!=='stop'||v.target>=0)&&(!['event'].includes(v.phase)||['market','rain'].includes(v.event))){s=v;}}catch{}}
+restore();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(s));$('adv-save').textContent='旅程已儲存，關閉後可繼續。';}catch{$('adv-save').textContent='此瀏覽器目前無法儲存，請在離開前下載足跡。';}}
+function log(t){s.log.unshift(t);s.log=s.log.slice(0,8);}
+function afterStop(){s.event=s.turn===2?'market':s.turn===4?'rain':null;s.phase=s.event?'event':s.turn>=s.max||s.visited.length===8?'over':'travel';save();render();}
+function endEvent(){s.event=null;s.phase=s.turn>=s.max||s.visited.length===8?'over':'travel';save();render();}
+let zoom=14;const projected=(lat,lng,z=zoom)=>{const n=256*2**z,rad=lat*Math.PI/180;return{x:(lng+180)/360*n,y:(1-Math.log(Math.tan(rad)+1/Math.cos(rad))/Math.PI)/2*n};};
+const W=960,H=620;let left=0,top=0;
+function configureView(){for(zoom=16;zoom>=6;zoom--){const points=SPOTS.map(p=>projected(p.lat,p.lng)),xs=points.map(p=>p.x),ys=points.map(p=>p.y);const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);if(maxX-minX<W-240&&maxY-minY<H-160){left=(minX+maxX)/2-W/2;top=(minY+maxY)/2-H/2;break;}}}
+configureView();
+const xy=spot=>{const p=projected(spot.lat,spot.lng);return{x:p.x-left,y:p.y-top};};
+async function loadMap(){
+ if(mapPromise)return mapPromise;
+ mapPromise=(async()=>{const loadRevision=revision,mapLeft=left,mapTop=top,z=zoom;const c=document.createElement('canvas');c.width=W;c.height=H;const ctx=c.getContext('2d');ctx.fillStyle='#e9ede8';ctx.fillRect(0,0,W,H);let failed=0;
+ const jobs=[];for(let x=Math.floor(mapLeft/256);x<=Math.floor((mapLeft+W)/256);x++)for(let y=Math.floor(mapTop/256);y<=Math.floor((mapTop+H)/256);y++)jobs.push({x,y});
+ // 只載入目前可見範圍、不預抓其他縮放層級；使用瀏覽器正常 HTTP 快取。
+ let next=0;await Promise.all(Array.from({length:3},async()=>{while(next<jobs.length){const {x,y}=jobs[next++];try{const img=await new Promise((resolve,reject)=>{const im=new Image();im.crossOrigin='anonymous';const timer=setTimeout(()=>reject(Error('timeout')),10000);im.onload=()=>{clearTimeout(timer);resolve(im);};im.onerror=()=>{clearTimeout(timer);reject(Error('tile'));};im.src=`https://tile.openstreetmap.org/${z}/${x}/${y}.png`;});ctx.drawImage(img,x*256-mapLeft,y*256-mapTop);}catch{failed++;}}}));
+ if(loadRevision!==revision)return;
+ if(failed){mapReady=false;mapPromise=null;$('adv-map-status').textContent='部分地圖未載入。可繼續遊戲，請按「重新載入地圖」後再下載足跡。';return;}
+ base=c;mapReady=true;$('adv-map-status').textContent='實際地理位置圖；虛線僅表示遊戲移動，不是道路或交通路線。';paint();
+ })();return mapPromise;
+}
+function paint(){const canvas=$('adv-map'),ctx=canvas.getContext('2d');if(!ctx)return;ctx.clearRect(0,0,W,H);if(base)ctx.drawImage(base,0,0);else{ctx.fillStyle='#e3eee8';ctx.fillRect(0,0,W,H);ctx.fillStyle='#47665c';ctx.font='24px "Island Trip TC",sans-serif';ctx.fillText(city+'地圖載入中…',32,52);}
+ if(s.route.length){ctx.beginPath();ctx.setLineDash([7,7]);ctx.lineWidth=4;ctx.strokeStyle='#d46b3f';s.route.forEach((i,n)=>{const p=xy(SPOTS[i]);n?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);});ctx.stroke();ctx.setLineDash([]);}
+ const offsets=[[-92,-19],[-104,-5],[-114,0],[20,13],[20,45],[25,-43],[-113,22],[-105,-35]];const occupied=[];
+ SPOTS.forEach((spot,i)=>{const p=xy(spot),seen=s.visited.includes(i);ctx.beginPath();ctx.arc(p.x,p.y,seen?16:12,0,Math.PI*2);ctx.fillStyle=seen?'#e59320':'#fff';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#214b50';ctx.stroke();ctx.fillStyle='#173b3b';ctx.font='bold 15px "Island Trip TC",sans-serif';ctx.textAlign='center';ctx.fillText(String(i+1),p.x,p.y+5);ctx.textAlign='left';const text=spot.name,[dx,dy]=offsets[i];ctx.font='bold 17px "Island Trip TC",sans-serif';const tw=ctx.measureText(text).width,tx=Math.max(5,Math.min(W-tw-12,p.x+dx));let ty=Math.max(24,Math.min(H-45,p.y+dy));for(let a=0;a<10&&occupied.some(b=>tx<b.x+b.w&&tx+tw>b.x&&ty-19<b.y+25&&ty>b.y);a++)ty=Math.max(24,Math.min(H-45,p.y+dy+(a%2?-1:1)*(Math.floor(a/2)+1)*28));occupied.push({x:tx,y:ty-19,w:tw});ctx.fillStyle='rgba(255,255,255,.94)';ctx.fillRect(tx-4,ty-19,tw+8,25);ctx.fillStyle=seen?'#784409':'#24484d';ctx.fillText(text,tx,ty);});
+ const p=token||(s.current>=0?xy(SPOTS[s.current]):xy(SPOTS[0]));ctx.beginPath();ctx.arc(p.x,p.y-28,20,0,Math.PI*2);ctx.fillStyle='#dc6048';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#fff';ctx.font='bold 20px "Island Trip TC",sans-serif';ctx.textAlign='center';ctx.fillText('旅',p.x,p.y-21);ctx.textAlign='left';
+ ctx.fillStyle='rgba(255,255,255,.95)';ctx.fillRect(W-301,H-29,301,29);ctx.fillStyle='#183b3a';ctx.font='14px "Island Trip TC",sans-serif';ctx.fillText('© OpenStreetMap contributors · 北 ↑',W-290,H-9);
+ $('adv-download').disabled=!mapReady||!s.visited.length||busy;
+}
+function selectTarget(die){const unseen=SPOTS.map((p,i)=>({p,i})).filter(x=>!s.visited.includes(x.i));const preferred=unseen.filter(x=>x.p.kind===s.intent);const pool=preferred.length?preferred:unseen;return pool[(die-1)%pool.length].i;}
+const delay=ms=>new Promise(r=>setTimeout(r,new URLSearchParams(location.search).has('fast')||matchMedia('(prefers-reduced-motion: reduce)').matches?0:ms));
+async function roll(reroll=false){if(busy||s.phase!=='travel'||(!reroll&&s.target>=0)||reroll&&s.reroll<1)return;busy=true;if(reroll)s.reroll--;s.target=-1;render();
+ try{for(let i=0;i<8;i++){$('adv-die').textContent=['⚀','⚁','⚂','⚃','⚄','⚅'][random(6)];await delay(65);}s.die=random(6)+1;s.target=selectTarget(s.die);save();log(`擲出 ${s.die} 點，下一站是${SPOTS[s.target].name}。`);const a=s.current>=0?xy(SPOTS[s.current]):xy(SPOTS[0]),b=xy(SPOTS[s.target]);for(let k=1;k<=20;k++){token={x:a.x+(b.x-a.x)*k/20,y:a.y+(b.y-a.y)*k/20};paint();await delay(30);}}
+ finally{token=null;busy=false;render();save();}}
+function button(label,action,disabled=false){const b=document.createElement('button');b.type='button';b.className='btn';b.textContent=label;b.disabled=disabled||busy;b.onclick=action;return b;}
+function arrive(){if(busy||s.target<0)return;s.phase='stop';save();render();}
+function visit(action){if(busy||s.phase!=='stop')return;const spot=SPOTS[s.target];const cost=action==='eat'?60:action==='gift'?80:0;if(s.money<cost)return;s.money-=cost;s.current=s.target;s.visited.push(s.target);s.route.push(s.target);s.target=-1;s.turn++;
+ if(action==='eat'){s.food++;s.mood++;s.inventory.push(spot.kind==='food'?spot.item:'巷口小點心');}else if(action==='gift'){s.inventory.push(spot.item);s.mood+=2;}else{s.culture+=spot.kind==='culture'?2:1;s.inventory.push(spot.kind==='culture'?spot.item:'城市觀察筆記');}
+ log(`在${spot.name}蓋下第 ${s.visited.length} 枚章，${action==='eat'?'吃了點好吃的':action==='gift'?'帶走一份紀念品':'收集一段在地故事'}。`);afterStop();}
+function render(){
+ $('adv-city-title').textContent=city.replace('臺','台');$('adv-city').value=city;
+ $('adv-money').textContent=s.money;$('adv-mood').textContent=s.mood;$('adv-turn').textContent=`${s.turn} / ${s.max}`;$('adv-stamps').textContent=s.visited.length;
+ $('adv-food-task').textContent=`美食 ${Math.min(2,s.food)} / 2`;$('adv-culture-task').textContent=`文化 ${Math.min(4,s.culture)} / 4`;$('adv-food-task').classList.toggle('done',s.food>=2);$('adv-culture-task').classList.toggle('done',s.culture>=4);
+ $('adv-die').textContent=['⚀','⚁','⚂','⚃','⚄','⚅'][s.die-1]||'⚀';$('adv-roll').disabled=busy||s.phase!=='travel'||s.target>=0;$('adv-reroll').hidden=!s.reroll||s.phase!=='travel'||s.target<0;$('adv-reroll').disabled=busy;
+ document.querySelectorAll('[data-adv-intent]').forEach(b=>{b.setAttribute('aria-pressed',String(s.intent===b.dataset.advIntent));b.disabled=busy||s.target>=0;});
+ const titles={ready:'突然放假，今天去'+city+'！',train:'你的出發列車揭曉',travel:s.target>=0?'下一站，準備下車':'接下來，想去哪一站？',stop:s.target>=0?SPOTS[s.target].name:'旅途中',event:s.event==='market'?'巧遇巷口小市集':'午後突然下起雨',over:'這趟旅行，屬於你。'};
+ $('adv-scene-title').textContent=titles[s.phase];const actions=$('adv-actions');actions.replaceChildren();let body='',icon='🧳',tag='TAINAN · 旅行冒險';
+ if(s.phase==='ready'){body='6 枚景點章、2 次美食體驗、4 點文化值。先抽一班出發列車，開始你的城市小旅行。遊戲出發地為臺北，列車依目的地限制抽選。';actions.append(button('抽出發列車 →',()=>{const pool=trainPool();s.train=pool[random(pool.length)];const t=TRAINS[s.train];s.reroll=t.reroll||0;s.mood+=t.mood||0;s.max=t.max;s.phase='train';log(`搭到${t.name}！${t.note}`);save();render();}));}
+ if(s.phase==='train'){const t=TRAINS[s.train];body=`搭到${t.name}！${t.note}（列車能力與旅費為遊戲設定。）`;icon=t.icon;actions.append(button('登車，出發！',()=>{s.phase='travel';save();render();}));}
+ if(s.phase==='travel'){if(s.target>=0){const p=SPOTS[s.target];icon=p.icon;body=`擲出 ${s.die} 點，這次前往${p.name}。${p.desc}`;actions.append(button('到站，看看能做什麼 →',arrive));}else{icon='🎲';body='選擇美食、文化或隨興漫遊，再擲骰子。骰子會從尚未走訪、符合偏好的地點決定下一站；旅人會移動到真實地理位置。';}}
+ if(s.phase==='stop'){const p=SPOTS[s.target];icon=p.icon;body=p.desc+' 想怎麼記住這一站？';if(p.kind==='food'){actions.append(button('吃一份在地滋味 · $60／美食 +1',()=>visit('eat'),s.money<60));actions.append(button('觀察街景 · 免費／文化 +1',()=>visit('story')));}else if(p.kind==='gift'){actions.append(button('買旅行紀念品 · $80／心情 +2',()=>visit('gift'),s.money<80));actions.append(button('搭老電梯、看建築 · 免費／文化 +1',()=>visit('story')));}else{actions.append(button('聽一段故事 · 免費／文化 +2',()=>visit('story')));actions.append(button('找巷口點心 · $60／美食 +1',()=>visit('eat'),s.money<60));}}
+ if(s.phase==='event'){icon=s.event==='market'?'🍡':'☔';if(s.event==='market'){body='突然聞到香味，巷口的小市集讓人忍不住停下來。要不要讓行程多一點美食？';actions.append(button('吃一份小點 · $40／美食 +1',()=>{s.money-=40;s.food++;s.inventory.push('奇遇・市集小吃');log('市集奇遇：吃到意外的小點心。');endEvent();},s.money<40));actions.append(button('跟攤主聊聊 · 文化 +1',()=>{s.culture++;log('市集奇遇：聽到一段在地故事。');endEvent();}));}else{body='行程正精彩，午後卻下起雨。這也是旅行的一部分，要怎麼接住這個意外？';actions.append(button('買傘繼續 · $30／心情 +1',()=>{s.money-=30;s.mood++;s.inventory.push('奇遇・旅途小雨傘');log('雨天奇遇：買把傘，繼續探險。');endEvent();},s.money<30));actions.append(button('屋簷下看雨 · 免費／文化 +1',()=>{s.culture++;log('雨天奇遇：慢下來，也看見新風景。');endEvent();}));}}
+ if(s.phase==='over'){icon='🎉';const done=s.food>=2&&s.culture>=4&&s.visited.length>=6;tag=done?'任務達成 · 城市全能旅人':'旅程完成 · 隨興城市旅人';body=`收集 ${s.visited.length} 枚章、${s.food} 次美食、${s.culture} 點文化。${done?'兩項支線任務完成！':'還有沒走過的角落，下次換個玩法吧。'} 到下方地圖下載你的地理足跡（遊戲紀錄）。`;actions.append(button('再來一趟不同的旅行',restart));}
+ $('adv-scene-tag').textContent=tag;$('adv-scene-icon').textContent=icon;$('adv-scene-body').textContent=body;
+ $('adv-inventory').replaceChildren(...s.inventory.map(t=>{const li=document.createElement('li');li.textContent=t;return li;}));if(!s.inventory.length){const li=document.createElement('li');li.textContent='背包還空著，等你收集故事與小吃。';$('adv-inventory').append(li);}
+ $('adv-log').replaceChildren(...s.log.slice(0,5).map(t=>{const li=document.createElement('li');li.textContent=t;return li;}));
+ $('adv-stamp-list').replaceChildren(...SPOTS.map((p,i)=>{const li=document.createElement('li');li.className=s.visited.includes(i)?'is-stamped':'';li.textContent=`${p.icon} ${p.name}${s.visited.includes(i)?' ✓':''}`;const b=document.createElement('button');b.type='button';b.textContent='Google Maps';b.onclick=()=>window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(city+' '+p.name),'_blank','noopener');li.append(b);return li;}));
+ if(s.train!==null)$('adv-train-tag').textContent=`${TRAINS[s.train].icon} ${TRAINS[s.train].name}`;else $('adv-train-tag').textContent='車票還沒揭曉';paint();
+}
+function restart(){if(busy)return;if(confirm('開始新旅程？目前城市冒險進度會清除，建議先下載足跡。')){revision++;s=fresh();token=null;save();render();}}
+$('adv-random-city').onclick=async()=>{if(busy)return;busy=true;render();$('adv-random-city').disabled=true;const cities=Object.keys(IslandCities);try{for(let i=0;i<10;i++){$('adv-city-title').textContent=cities[random(cities.length)];await delay(80);}const chosen=cities[random(cities.length)];busy=false;$('adv-city').value=chosen;$('adv-city').dispatchEvent(new Event('change'));log('驚喜目的地揭曉：'+chosen+'！');save();render();}finally{busy=false;$('adv-random-city').disabled=false;}};
+$('adv-city').replaceChildren(...Object.keys(IslandCities).map(c=>new Option(c,c)));
+$('adv-city').onchange=e=>{if(busy){e.target.value=city;return;}save();city=e.target.value;KEY='island-fun-city-adventure-v1:'+city;SPOTS=IslandCities[city].map(p=>({...p}));revision++;base=null;mapReady=false;mapPromise=null;token=null;configureView();restore();try{localStorage.setItem('island-fun-adventure-city',city);}catch{}render();loadMap();save();};
+$('adv-roll').onclick=()=>roll();$('adv-reroll').onclick=()=>roll(true);$('adv-restart').onclick=restart;
+document.querySelectorAll('[data-adv-intent]').forEach(b=>b.onclick=()=>{if(busy||s.target>=0)return;s.intent=b.dataset.advIntent;save();render();});
+$('adv-map-retry').onclick=()=>{if(!mapReady)loadMap();};
+$('adv-map').onclick=e=>{const rect=e.currentTarget.getBoundingClientRect(),x=(e.clientX-rect.left)*W/rect.width,y=(e.clientY-rect.top)*H/rect.height;const i=SPOTS.findIndex(p=>{const a=xy(p);return Math.hypot(a.x-x,a.y-y)<26;});if(i>=0)$('adv-map-status').textContent=`${SPOTS[i].name}｜${s.visited.includes(i)?'已蓋章':'還沒走訪'}：${SPOTS[i].desc}`;};
+$('adv-copy').onclick=async()=>{const text='一起來'+city+'冒險！\n'+s.route.map((i,n)=>`${n+1}. ${SPOTS[i].name}\nhttps://www.google.com/maps/search/?api=1&query=${encodeURIComponent(city+' '+SPOTS[i].name)}`).join('\n\n')+'\n#島遊趣 #'+city+'旅行';try{await navigator.clipboard.writeText(text);$('adv-share-status').textContent='完整足跡與 Google 地點連結已複製。';}catch{$('adv-share-text').value=text;$('adv-share-text').hidden=false;$('adv-share-text').focus();$('adv-share-text').select();$('adv-share-status').textContent='請手動複製下方文字。';}};
+$('adv-download').onclick=async()=>{if(!mapReady||!s.visited.length||busy)return;try{if(document.fonts)await Promise.race([document.fonts.load('bold 28px "Island Trip TC"','臺南旅行足跡'),new Promise(r=>setTimeout(r,2000))]);paint();const c=document.createElement('canvas');c.width=1080;c.height=$('adv-share-format').value==='story'?1920:1080;const ctx=c.getContext('2d'),font='"Island Trip TC",sans-serif';ctx.fillStyle='#f3ecd8';ctx.fillRect(0,0,c.width,c.height);ctx.fillStyle='#254b48';ctx.font=`bold 56px ${font}`;ctx.fillText('島遊趣 · '+city+'足跡',40,88);ctx.font=`26px ${font}`;ctx.fillText(`${s.visited.length} 枚景點章  ·  美食 ${s.food}  ·  文化 ${s.culture}`,40,145);ctx.drawImage($('adv-map'),40,188,1000,646);ctx.font=`22px ${font}`;ctx.fillText('● 金色為已走訪地點；虛線為遊戲足跡，非實際道路。',40,875);ctx.font=`bold 20px ${font}`;let y=925,line='';const text=s.route.map(i=>SPOTS[i].name).join(' → ');for(const ch of text){if(ctx.measureText(line+ch).width>995){ctx.fillText(line,40,y);y+=30;line='';}line+=ch;}if(line)ctx.fillText(line,40,y);
+ if(c.height>1080){ctx.font=`bold 36px ${font}`;ctx.fillText('這趟旅程，收進背包的故事',40,1130);ctx.font=`28px ${font}`;s.inventory.slice(0,9).forEach((t,i)=>ctx.fillText('✦ '+t,60,1200+i*52,940));ctx.fillText('下次，找朋友一起出發吧。',40,1810);}
+ ctx.font=`20px ${font}`;ctx.fillText('底圖 © OpenStreetMap contributors · openstreetmap.org/copyright',40,c.height-20);c.toBlob(blob=>{if(!blob){$('adv-share-status').textContent='圖片未能產生，請重試。';return;}const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=c.height===1080?'island-fun-city-map.png':'island-fun-city-story.png';a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);$('adv-share-status').textContent='已下載含地理底圖、位置標記與足跡的分享圖。';},'image/png');}catch{$('adv-share-status').textContent='圖片未能匯出，請確認地圖載入後重試。';}};
+window.IslandAdventure={activate(){active=true;render();loadMap();},deactivate(){active=false;},getSpots:()=>SPOTS.map(p=>({...p}))};
+if(document.fonts)document.fonts.ready.then(paint);
+render();
+})();
