@@ -3,9 +3,9 @@
 現有名單全列檢視；非全臺餐廳普查，未涵蓋每個行政區。店名／地址來源不等於即時營業確認；搜尋未找到也不代表不存在。
 
 {
-  "originalSchoolRows": 138,
-  "addressSchoolRows": 61,
-  "pendingSchoolRows": 78,
+  "originalSchoolRows": 150,
+  "addressSchoolRows": 65,
+  "pendingSchoolRows": 86,
   "withdrawnRows": 3,
   "counties": 22,
   "regionalRows": 100,
