@@ -10,11 +10,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap">
-  <link rel="stylesheet" href="style.css?v=20261025-25">
-  <link rel="stylesheet" href="adventure.css?v=20261025-25">
-  <link rel="stylesheet" href="mobile.css?v=20261025-25">
-  <link rel="stylesheet" href="quick-trip.css?v=20261025-25">
-  <link rel="stylesheet" href="recommendations.css?v=20261025-25">
+  <link rel="stylesheet" href="style.css?v=20261025-27">
+  <link rel="stylesheet" href="adventure.css?v=20261025-27">
+  <link rel="stylesheet" href="mobile.css?v=20261025-27">
+  <link rel="stylesheet" href="quick-trip.css?v=20261025-27">
+  <link rel="stylesheet" href="recommendations.css?v=20261025-27">
+<link rel="stylesheet" href="food-directory.css?v=20261025-27">
 </head>
 <body>
 
@@ -27,7 +28,7 @@
     </div>
   </header>
 
-  <nav class="site-links" aria-label="網站功能"><a href="index.html" aria-current="page">玩遊戲</a><a href="recommendations.html">我的推薦清單</a><a href="recommendations.html#coupons">合作優惠（預留）</a></nav>
+  <nav class="site-links" aria-label="網站功能"><a href="index.html" aria-current="page">玩遊戲</a><a href="recommendations.html">我的推薦清單</a><a href="food-directory.html">美食名單・Google 地圖</a><a href="recommendations.html#coupons">合作優惠（預留）</a></nav>
   <section id="app-health" class="app-health" role="alert" hidden><strong>此頁未完整載入</strong><p id="app-health-detail"></p><button id="app-health-reload" class="btn" type="button">重新整理網頁</button><a href="recommendations.html">開啟我的推薦清單</a></section>
   <section class="explorer" id="explorer" aria-label="旅行模式">
     <nav class="ex-modes" aria-label="選擇玩法">
@@ -71,8 +72,8 @@
       <div id="ex-category-controls" class="ex-controls" hidden><label for="ex-category">想去哪一類？</label><select id="ex-category"><option value="all">全部地點</option><option value="museum">博物館</option><option value="art">美術館</option><option value="library">圖書館</option><option value="trail">步道</option><option value="street">老街／聚落</option></select><p id="ex-category-note" class="plan-note"></p></div>
       <div id="ex-lunch-controls" class="ex-controls" hidden>
         <label for="ex-campus">學校／校區</label><select id="ex-campus"><option>三民校區</option><option>民生校區</option></select>
-        <details><summary>編輯午餐選項（餐點類型或店家）</summary><label for="ex-foods">每行一個選項，最多 40 個</label><textarea id="ex-foods" rows="6"></textarea><button id="ex-merge-foods" type="button" class="btn">加入預設與補充店家</button> <button id="ex-save-foods" type="button" class="btn">儲存午餐選項</button> <button id="ex-reset-foods" type="button" class="btn">恢復預設 16 個選項</button></details>
-        <p class="plan-note" id="ex-lunch-note"></p>
+        <details><summary>編輯午餐選項（餐點類型或店家）</summary><label for="ex-foods">每行一個選項，最多 40 個</label><textarea id="ex-foods" rows="6"></textarea><button id="ex-merge-foods" type="button" class="btn">加入目前可用的預設店家</button> <button id="ex-save-foods" type="button" class="btn">儲存午餐選項</button> <button id="ex-reset-foods" type="button" class="btn">恢復預設 16 個選項</button></details>
+        <label><input id="ex-include-extended" type="checkbox"> 納入市區延伸店家（另查交通）</label><p class="plan-note" id="ex-lunch-note"></p><a class="food-directory-link" href="food-directory.html">檢視美食名單與 Google 地圖 →</a>
       </div>
       <div id="ex-departure" class="ex-controls"><label for="ex-origin">遊戲出發縣市</label><select id="ex-origin"></select><p class="plan-note">可隨時變更出發縣市，第一站交通遊戲卡會同步更新。列車卡不代表實際班次。</p></div>
       <div class="ex-grid"><section class="panel ex-machine">
@@ -185,7 +186,7 @@
   </div>
 
   <footer class="footer">
-    島遊趣 · 本機清單修正版 2026.10.25-r25
+    島遊趣 · 美食複核版 2026.10.25-r27
   </footer>
 
   <!-- 景點／事件卡片 -->
@@ -225,21 +226,22 @@
     </div>
   </div>
 
-  <script src="app-health.js?v=20261025-25" defer></script>
-  <script src="transport.js?v=20261025-25" defer></script>
-  <script src="city-data.js?v=20261025-25" defer></script>
-  <script src="trip-plan.js?v=20261025-25" defer></script>
-  <script src="lunch-data.js?v=20261025-25" defer></script>
-  <script src="community-data.js?v=20261025-25" defer></script>
-  <script src="location-search.js?v=20261025-25" defer></script>
-  <script src="place-map.js?v=20261025-25" defer></script>
-  <script src="plan-actions.js?v=20261025-25" defer></script>
-  <script src="game.js?v=20261025-25" defer></script>
-  <script src="adventure.js?v=20261025-25" defer></script>
-  <script src="nearby.js?v=20261025-25" defer></script>
-  <script src="quick-trip.js?v=20261025-25" defer></script>
-  <script src="explore.js?v=20261025-25" defer></script>
-  <script src="workspace-tabs.js?v=20261025-25" defer></script>
+  <script src="app-health.js?v=20261025-27" defer></script>
+  <script src="transport.js?v=20261025-27" defer></script>
+  <script src="city-data.js?v=20261025-27" defer></script>
+  <script src="trip-plan.js?v=20261025-27" defer></script>
+  <script src="lunch-data.js?v=20261025-27" defer></script>
+  <script src="community-data.js?v=20261025-27" defer></script>
+  <script src="food-audit.js?v=20261025-27" defer></script>
+  <script src="location-search.js?v=20261025-27" defer></script>
+  <script src="place-map.js?v=20261025-27" defer></script>
+  <script src="plan-actions.js?v=20261025-27" defer></script>
+  <script src="game.js?v=20261025-27" defer></script>
+  <script src="adventure.js?v=20261025-27" defer></script>
+  <script src="nearby.js?v=20261025-27" defer></script>
+  <script src="quick-trip.js?v=20261025-27" defer></script>
+  <script src="explore.js?v=20261025-27" defer></script>
+  <script src="workspace-tabs.js?v=20261025-27" defer></script>
 
 </body>
 </html>

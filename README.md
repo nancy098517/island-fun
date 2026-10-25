@@ -1,3 +1,15 @@
+## r27 美食名單複核與 Google 地圖檢視
+
+- 新增 food-directory.html 三分頁名單：學區店家、22縣市美食靈感、待確認結果。每筆可開 Google 地圖。
+- 現有138筆學區／三民選項逐項分類，另補1筆民生校區店家；61筆有地址來源、78筆待確認（不等同歇業），另留r26移除3筆紀錄。來源可能為歷史名錄，非2026即時營業保證。
+- 7個校區分開使用有地址來源的預設；市區延伸須自行勾選，甜點及夜市小吃時段需自查。原自訂清單不自動刪除。
+- 新竹及嘉義分縣市整理，修正米苔目／白糖粿／北港冰品部名稱；料理種類只提供找供應店家，不當成確定餐廳。
+- 現有資料尚未涵蓋全臺每個行政區，不以虛構店家補滿，可指定縣市及行政區搜尋Google地圖。
+- 查核資料見 data/food-audit.json、data/food-audit-notes.md；新增 food-audit.js、food-directory.html/css/js 必須整包上傳。
+
+## r26 彰師大名單訂正
+依維護者提供的查核回報，移除三筆歇業或無法確認的預設店家，不以未查核店家補位。既有自訂清單與行程不自動刪除；若曾儲存舊名單，可自行編輯，或先備份再恢復校區預設。
+
 # 本機清單修正版 r25 · 2026-10-25
 
 這次只新增個人本機清單、Excel 備份、Gemini 交接與優惠預留，不提供共用投稿、GitHub 寫入或廠商核銷後台。
@@ -21,7 +33,7 @@
 
 ## 更新網站
 
-解壓縮後上傳 island-fun 內全部檔案及資料夾，包含 recommendations.html、recommendations.js、recommendation-data.js、recommendations.css、app-health.js、data、vendor 及原 assets。不要只上傳 index.html。頁尾應為「本機清單修正版 2026.10.25-r25」。測試頁不在交付壓縮檔。
+解壓縮後上傳 island-fun 內全部檔案及資料夾，包含 recommendations.html、recommendations.js、recommendation-data.js、recommendations.css、app-health.js、data、vendor 及原 assets。不要只上傳 index.html。頁尾應為「本機清單修正版 2026.10.25-r26」。測試頁不在交付壓縮檔。
 
 # 定位與操作修正版 r24 · 2026-10-25
 

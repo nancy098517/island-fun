@@ -1,6 +1,7 @@
 /* 島遊趣：三種決策模式。所有預設景點是候選靈感，非已驗證行程。 */
 (() => {
 'use strict';
+if(!window.IslandFoodAudit)return;
 const COUNTY = {
  '臺北市':['臺北101','國立故宮博物院','龍山寺','大安森林公園'],
  '新北市':['淡水老街','九份老街','野柳地質公園','鶯歌陶瓷博物館'],
@@ -53,16 +54,16 @@ const route=()=>s.routes[routeKey()] || [];
 const lunchCampus=()=>IslandLunch.campuses[s.campus];
 const lunchLabel=()=>lunchCampus().label;
 const lunchQuery=()=>lunchCampus().city+' '+lunchCampus().query;
-const lunchDefaults=()=>s.campus==='民生校區'?s.lunch:[...new Set([...(s.campus==='三民校區'?s.lunch:[]),...(IslandLunch.shops[s.campus]||[]).map(p=>p.name)])];
-const lunchPlaceQuery=name=>{const p=IslandLunch.findShop(s.campus,name);if(p)return lunchCampus().city+' '+(p.provided?'':p.area+' ')+name;return IslandLunch.addresses[name]?IslandLunch.addresses[name]+' '+name:lunchQuery()+' 附近 '+name;};
+const lunchDefaults=()=>[...new Set((IslandLunch.shops[s.campus]||[]).filter(p=>p.scope!=='extended'||s.includeExtended===true).map(p=>p.name))];
+const lunchPlaceQuery=name=>{const p=IslandLunch.findShop(s.campus,name);if(p)return [p.address||p.area,p.name].filter(Boolean).join(' ');return IslandLunch.addresses[name]?IslandLunch.addresses[name]+' '+name:lunchQuery()+' 附近 '+name;};
 // 依提供的店家截圖更正舊名稱，保留既有選項與抽選紀錄。
 const correctName=n=>['熹湯舖子','熹湯鋪子'].includes(n)?'熹湯鋪子【台中中華店】':n;
 s.lunch=s.lunch.map(correctName);for(const k of ['lunch:三民校區','lunch:民生校區']){if(s.custom[k])s.custom[k]=s.custom[k].map(correctName);if(s.routes[k])s.routes[k]=s.routes[k].map(p=>correctName(p.name)!==p.name?{...p,name:correctName(p.name),query:IslandLunch.addresses[correctName(p.name)]+' '+correctName(p.name)}:p);}
 
 // 舊版預設的餐點種類不再混入真實店家抽選；保留自行編輯的清單。
 if(s.realFoodRevision!==1){for(const campus of Object.keys(IslandLunch.shops)){const key='lunch:'+campus,a=s.custom[key];if(a&&a.length===IslandLunch.starter.length&&a.every((n,i)=>n===IslandLunch.starter[i]))delete s.custom[key];if(!s.custom[key]&&s.routes[key])s.routes[key]=s.routes[key].filter(p=>!IslandLunch.starter.includes(p.name));}s.realFoodRevision=1;}
-function lunchPlace(name){const p=IslandLunch.findShop(s.campus,name);return {name,query:lunchPlaceQuery(name),...(p?{dish:p.dish,area:p.area,note:p.note,source:p.source,provided:!!p.provided}:{})};}
-function shopInfo(x){const p=document.createElement('p');p.className='shop-info';p.textContent=[x.dish,x.area,x.note].filter(Boolean).join(' · ');if(x.source){const a=makeLink('店家參考',x.source);p.append(' ',a);}return p;}
+function lunchPlace(name){const p=IslandLunch.findShop(s.campus,name);return {name,query:lunchPlaceQuery(name),...(p?{dish:p.dish,area:p.area,address:p.address,scope:p.scope,note:p.note,source:p.source,provided:!!p.provided}:{})};}
+function shopInfo(x){const p=document.createElement('p');p.className='shop-info';p.textContent=[x.dish,x.area,x.note].filter(Boolean).join(' · ');if(x.scope==='extended')p.append(' · 市區延伸，另查交通');if(x.source){const a=makeLink('資料來源',x.source);p.append(' ',a);}return p;}
 function options(ignoreFilter=false){
  if(s.mode==='county'&&!s.county)return Object.keys(COUNTY).map(name=>({name,query:name}));
  if(s.custom[routeKey()])return s.custom[routeKey()].map(name=>s.mode==='lunch'?lunchPlace(name):{name,query:(s.mode==='county'?s.county+' ':'')+name});
@@ -87,18 +88,18 @@ function render(){
  $('ex-county-controls').hidden=s.mode!=='county';$('ex-lunch-controls').hidden=s.mode!=='lunch';
  $('ex-county').value=s.county;$('ex-category-controls').hidden=!['taiwan','county'].includes(s.mode)||countyPick;$('ex-category').value=s.custom[routeKey()]?'all':s.category;$('ex-category').disabled=busy||!!s.custom[routeKey()];$('ex-category-note').textContent=s.custom[routeKey()]?'目前使用自訂清單，類別篩選暫停；自訂內容完整保留。':'新增名單為使用者提供的候選，並非已查核場館清冊。步道請先確認開放、天候與申請資訊。';
  $('ex-departure').hidden=s.mode==='lunch'||countyPick;$('ex-origin').value=s.origins[routeKey()]||'臺北市';$('ex-origin').disabled=busy;
- $('ex-campus').value=s.campus;$('ex-reset-foods').textContent='恢復此校區預設 '+lunchDefaults().length+' 家／選項';if($('lunch-custom-title'))$('lunch-custom-title').textContent=lunchLabel()+'・自訂午餐';$('ex-lunch-note').textContent=s.campus==='民生校區'?'保留原有 16 個選項，可自行編輯。':'已加入店家口袋名單，含使用者補充候選；部分為夜市、甜點或需接駁的市區店家，分店與時段請確認。';$('ex-foods').value=(s.custom[routeKey()]||lunchDefaults()).join('\n');
+ $('ex-campus').value=s.campus;$('ex-reset-foods').textContent='恢復此校區預設 '+lunchDefaults().length+' 家／選項';if($('lunch-custom-title'))$('lunch-custom-title').textContent=lunchLabel()+'・自訂午餐';$('ex-include-extended').checked=s.includeExtended===true;$('ex-include-extended').disabled=busy||!!s.custom[routeKey()];$('ex-lunch-note').textContent=s.custom[routeKey()]?'目前使用你儲存的自訂名單，未自動刪除舊項目。可自行編輯，或先保存行程後恢復校區預設。':'目前預設只使用有店名／地址來源的候選，並非即時營業確認；含小吃、飲料及甜點，午餐供餐時段請另查。市區延伸選項預設不納入。';$('ex-foods').value=(s.custom[routeKey()]||lunchDefaults()).join('\n');
  $('ex-custom-editor').hidden=countyPick||s.mode==='lunch';$('ex-map-places').value=options(true).map(x=>x.name).join('\n');
  $('ex-title').textContent=s.mode==='lunch'?'午餐吃什麼？':countyPick?'突然放假，去哪個縣市？':s.mode==='county'?s.county+'探索地圖':'今天，遊台灣';
- $('ex-description').textContent=s.mode==='lunch'?'以'+lunchLabel()+'為搜尋範圍。'+(s.campus==='三民校區'?'保留原有選項，加入一中商圈口袋名單。':s.campus==='民生校區'?'保留原有午餐選項。':'抽校園周邊口袋名單，看看今天去哪家吃。')+' 各校區的清單與紀錄分開保留。':countyPick?'選一種玩法抽縣市，或直接選擇縣市；抽到後就進入當地景點地圖。':s.mode==='county'?'每抽一次決定下一個當地景點或美食，加入你的旅行路線。':'直接從全台候選景點抽下一站；想集中玩同一縣市，請切換「選縣市玩」。';
+ $('ex-description').textContent=s.mode==='lunch'?'以'+lunchLabel()+'為搜尋範圍。'+'先從有地址來源的名單抽選，看看今天去哪家吃。'+' 各校區的清單與紀錄分開保留。':countyPick?'選一種玩法抽縣市，或直接選擇縣市；抽到後就進入當地景點地圖。':s.mode==='county'?'每抽一次決定下一個當地景點或美食，加入你的旅行路線。':'直接從全台候選景點抽下一站；想集中玩同一縣市，請切換「選縣市玩」。';
  const mapPoint=s.last||route().at(-1);IslandMap.show(mapPoint?mapPoint.query:s.mode==='lunch'?lunchQuery():s.mode==='county'&&s.county?s.county:'台灣',mapPoint?mapPoint.name:s.mode==='lunch'?lunchLabel():s.mode==='county'&&s.county?s.county:'台灣');
  const list=candidates();$('ex-count').textContent=`本次候選 ${list.length} 個`;
- $('ex-candidate-list').replaceChildren(...options().map(x=>{const li=document.createElement('li');const i=list.findIndex(v=>v.query===x.query);const b=document.createElement('button');b.type='button';b.textContent=(i<0?'✓ 已加入 · ':`${i+1}. `)+x.name;b.onclick=()=>IslandMap.show(x.query,x.name,true);li.append(b);if(x.dish||x.provided)li.append(shopInfo(x));li.classList.toggle('ex-visited',i<0);return li;}));
+ $('ex-candidate-list').replaceChildren(...options().map(x=>{const li=document.createElement('li');const i=list.findIndex(v=>v.query===x.query);const b=document.createElement('button');b.type='button';b.textContent=(i<0?'✓ 已加入 · ':`${i+1}. `)+x.name;b.onclick=()=>IslandMap.show(x.query,x.name,true);li.append(b);if(x.dish||x.provided)li.append(shopInfo(x));li.append(makeLink('Google 地圖檢視 ↗',mapURL(x.query)));li.classList.toggle('ex-visited',i<0);return li;}));
  $('ex-next-label').textContent=countyPick?'先抽縣市':s.mode==='lunch'?'抽今天午餐':'抽下一站';
  $('ex-result').hidden=!s.last;
  if(s.last){$('ex-result-name').textContent=s.last.name;$('ex-result-transport').textContent=s.last.transport?IslandTransport.text(s.last.transport):'';$('ex-result-map').replaceChildren(...((s.mode==='lunch'||s.last.provided)?[shopInfo(s.last)]:[]),markPlace(s.last));}
  const r=route();IslandMap.setTrip(s.mode==='lunch'?lunchLabel()+'午餐邀約':s.mode==='county'&&s.county?s.county+'出遊邀約':'我的台灣旅行邀約',r);$('ex-route-title').textContent=s.mode==='lunch'?lunchLabel()+'午餐抽選紀錄':s.mode==='county'&&s.county?s.county+'旅行路線':'我的台灣旅行路線';
- $('ex-route').replaceChildren(...r.map((x,i)=>{const li=document.createElement('li');const title=document.createElement('strong');title.textContent=x.name;li.append(title);if(x.dish||x.provided)li.append(shopInfo(x));if(x.transport){const note=document.createElement('p');note.className='ex-train-note';note.textContent=IslandTransport.text(x.transport);li.append(note);}const links=document.createElement('div');links.className='ex-route-links';links.append(markPlace(x));const del=document.createElement('button');del.type='button';del.textContent='移除';del.setAttribute('aria-label','移除'+x.name);del.onclick=()=>{if(busy)return;s.routes[routeKey()].splice(i,1);s.last=null;render();persist();};links.append(del);li.append(links);return li;}));
+ $('ex-route').replaceChildren(...r.map((x,i)=>{const li=document.createElement('li');const title=document.createElement('strong');title.textContent=x.name;li.append(title);if(x.dish||x.provided)li.append(shopInfo(x));if(x.transport){const note=document.createElement('p');note.className='ex-train-note';note.textContent=IslandTransport.text(x.transport);li.append(note);}const links=document.createElement('div');links.className='ex-route-links';links.append(markPlace(x),makeLink('Google 地圖檢視 ↗',mapURL(x.query)));const del=document.createElement('button');del.type='button';del.textContent='移除';del.setAttribute('aria-label','移除'+x.name);del.onclick=()=>{if(busy)return;s.routes[routeKey()].splice(i,1);s.last=null;render();persist();};links.append(del);li.append(links);return li;}));
  $('ex-empty').hidden=!!r.length;$('ex-copy').disabled=!r.length;$('ex-copy-ai').disabled=!r.length;$('ex-gemini').disabled=!r.length;$('ex-clear').disabled=!r.length&&!s.finished[routeKey()];
  $('ex-manual-copy').hidden=true;$('ex-manual-label').hidden=true;
  document.querySelectorAll('[data-draw]').forEach(b=>b.disabled=busy||!!s.finished[routeKey()]||!list.length);
@@ -146,8 +147,9 @@ $('ex-reroll-county').onclick=()=>{if(busy)return;s.county='';s.last=null;render
 $('ex-campus').replaceChildren(...Object.entries(IslandLunch.campuses).map(([key,c])=>new Option(c.label,key)));
 $('ex-category').onchange=e=>{if(busy){e.target.value=s.category;return;}s.category=e.target.value;s.last=null;render();persist();setStatus('已切換抽選類型，既有行程保留。');};
 $('ex-campus').onchange=e=>{if(busy){e.target.value=s.campus;return;}s.campus=e.target.value;s.last=null;render();persist();};
+$('ex-include-extended').onchange=()=>{s.includeExtended=$('ex-include-extended').checked;render();persist();setStatus('預設候選已更新，既有行程保留。');};
 $('ex-reset-foods').onclick=()=>{if(busy)return;if(confirm('恢復此校區預設午餐選項，並清除此校區抽選紀錄？')){delete s.custom[routeKey()];if(['三民校區','民生校區'].includes(s.campus))s.lunch=DEFAULT_LUNCH;s.routes[routeKey()]=[];delete s.finished[routeKey()];s.last=null;render();persist();setStatus('已恢復此校區的 '+lunchDefaults().length+' 個午餐選項。');}};
-$('ex-merge-foods').onclick=()=>{if(busy)return;const old=$('ex-foods').value.split('\n').map(x=>x.trim()).filter(Boolean),merged=[...new Set([...old,...lunchDefaults()])];if(merged.length>40){setStatus('合併後超過 40 個選項，請先刪減清單。');return;}$('ex-foods').value=merged.join('\n');setStatus('已把預設與補充店家加入輸入框；按「儲存午餐選項」才會套用。');IslandPlanActions.refresh();};
+$('ex-merge-foods').onclick=()=>{if(busy)return;const old=$('ex-foods').value.split('\n').map(x=>x.trim()).filter(Boolean),merged=[...new Set([...old,...lunchDefaults()])];if(merged.length>40){setStatus('合併後超過 40 個選項，請先刪減清單。');return;}$('ex-foods').value=merged.join('\n');setStatus('已把目前可用的預設店家加入輸入框；按「儲存午餐選項」才會套用。');IslandPlanActions.refresh();};
 $('ex-save-foods').onclick=()=>{if(busy)return;const list=[...new Set($('ex-foods').value.split('\n').map(x=>x.trim()).filter(Boolean))];if(!list.length||list.length>40||list.some(x=>x.length>60)){setStatus('請輸入 1～40 個午餐選項，每行一個，每項最多 60 字。');return;}if(route().length&&!confirm('更新午餐地圖會清除這個校區目前的抽選紀錄，是否套用？'))return;s.custom[routeKey()]=list;s.routes[routeKey()]=[];delete s.finished[routeKey()];s.last=null;render();persist();setStatus('午餐選項已更新，地圖會抽你輸入的餐點或店家。');};
 $('ex-apply-map').onclick=()=>{if(busy)return;const list=[...new Set($('ex-map-places').value.split('\n').map(x=>x.trim()).filter(Boolean))];if(!list.length||list.length>150||list.some(n=>n.length>60)){setStatus('請輸入 1～150 個地點，每行一個，每項最多 60 字。');return;}if(route().length&&!confirm('替換地圖會清除這張地圖的抽選紀錄，是否套用？'))return;s.custom[routeKey()]=list;s.routes[routeKey()]=[];delete s.finished[routeKey()];s.last=null;render();persist();setStatus('地圖已替換。接下來只會抽到你輸入的地點。');};
 $('ex-default-map').onclick=()=>{if(busy)return;if(confirm('恢復預設地點並清除此地圖抽選紀錄？')){delete s.custom[routeKey()];s.routes[routeKey()]=[];delete s.finished[routeKey()];s.last=null;render();persist();setStatus('已恢復預設地圖。');}};

@@ -149,13 +149,6 @@ IslandLunch.shops={
   ],
   "彰師大進德校區": [
     {
-      "name": "老長官蔥油餅",
-      "dish": "蔥油餅、北方麵點",
-      "area": "彰化市進德路6號",
-      "source": "https://catkissfood.com/彰化美食老長官蔥油餅-彰師大高人氣北方麵點，料/",
-      "note": ""
-    },
-    {
       "name": "蘇菠麵",
       "dish": "手工麵食",
       "area": "彰化市進德路30號",
