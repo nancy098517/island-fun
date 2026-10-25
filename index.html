@@ -10,10 +10,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap">
-  <link rel="stylesheet" href="style.css?v=20261025-23b">
-  <link rel="stylesheet" href="adventure.css?v=20261025-23b">
-  <link rel="stylesheet" href="mobile.css?v=20261025-23b">
-  <link rel="stylesheet" href="quick-trip.css?v=20261025-23b">
+  <link rel="stylesheet" href="style.css?v=20261025-25">
+  <link rel="stylesheet" href="adventure.css?v=20261025-25">
+  <link rel="stylesheet" href="mobile.css?v=20261025-25">
+  <link rel="stylesheet" href="quick-trip.css?v=20261025-25">
+  <link rel="stylesheet" href="recommendations.css?v=20261025-25">
 </head>
 <body>
 
@@ -26,6 +27,8 @@
     </div>
   </header>
 
+  <nav class="site-links" aria-label="網站功能"><a href="index.html" aria-current="page">玩遊戲</a><a href="recommendations.html">我的推薦清單</a><a href="recommendations.html#coupons">合作優惠（預留）</a></nav>
+  <section id="app-health" class="app-health" role="alert" hidden><strong>此頁未完整載入</strong><p id="app-health-detail"></p><button id="app-health-reload" class="btn" type="button">重新整理網頁</button><a href="recommendations.html">開啟我的推薦清單</a></section>
   <section class="explorer" id="explorer" aria-label="旅行模式">
     <nav class="ex-modes" aria-label="選擇玩法">
       <button data-ex-mode="short" type="button">☀️ 突然有空，去哪玩？</button>
@@ -182,7 +185,7 @@
   </div>
 
   <footer class="footer">
-    島遊趣 · 短假期驚喜版 2026.10.25-r23
+    島遊趣 · 本機清單修正版 2026.10.25-r25
   </footer>
 
   <!-- 景點／事件卡片 -->
@@ -222,19 +225,21 @@
     </div>
   </div>
 
-  <script src="transport.js?v=20261025-23b" defer></script>
-  <script src="city-data.js?v=20261025-23b" defer></script>
-  <script src="trip-plan.js?v=20261025-23b" defer></script>
-  <script src="lunch-data.js?v=20261025-23b" defer></script>
-  <script src="community-data.js?v=20261025-23b" defer></script>
-  <script src="location-search.js?v=20261025-23b" defer></script>
-  <script src="place-map.js?v=20261025-23b" defer></script>
-  <script src="plan-actions.js?v=20261025-23b" defer></script>
-  <script src="game.js?v=20261025-23b" defer></script>
-  <script src="adventure.js?v=20261025-23b" defer></script>
-  <script src="quick-trip.js?v=20261025-23b" defer></script>
-  <script src="explore.js?v=20261025-23b" defer></script>
-  <script src="workspace-tabs.js?v=20261025-23b" defer></script>
+  <script src="app-health.js?v=20261025-25" defer></script>
+  <script src="transport.js?v=20261025-25" defer></script>
+  <script src="city-data.js?v=20261025-25" defer></script>
+  <script src="trip-plan.js?v=20261025-25" defer></script>
+  <script src="lunch-data.js?v=20261025-25" defer></script>
+  <script src="community-data.js?v=20261025-25" defer></script>
+  <script src="location-search.js?v=20261025-25" defer></script>
+  <script src="place-map.js?v=20261025-25" defer></script>
+  <script src="plan-actions.js?v=20261025-25" defer></script>
+  <script src="game.js?v=20261025-25" defer></script>
+  <script src="adventure.js?v=20261025-25" defer></script>
+  <script src="nearby.js?v=20261025-25" defer></script>
+  <script src="quick-trip.js?v=20261025-25" defer></script>
+  <script src="explore.js?v=20261025-25" defer></script>
+  <script src="workspace-tabs.js?v=20261025-25" defer></script>
 
 </body>
 </html>

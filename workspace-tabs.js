@@ -11,7 +11,7 @@ select.onchange=()=>{document.querySelector('[data-ex-mode='+select.value+']').c
 modeNav.hidden=true;modeNav.before(picker);modeNav.after(nav);
 const help=document.createElement('details');help.id='play-instructions';help.className='play-instructions';help.innerHTML='<summary>第一次玩？看操作說明</summary><div id="play-instructions-body"></div>';nav.after(help);let helpMode='';
 const instructions={
-short:['第一次預設臺中，也可先選所在縣市；按「我只有 2 小時」「半日微旅行」「雨天備案」即可抽選。時間以抵達抽中生活圈後計算，不含住處往返。','展開「調整這次心情」可選交通方式、喜好與一天行程。已抽結果保留自己的條件，重新抽選才套用新條件。','每站可「換一站」而保留其他站；雨天採單館慢遊，換站也只抽室內候選。按「找附近美食」到 Google Maps 選實際店家。','下方地圖標示有座標的地點；沒有座標時請按地點查詢確認。導航由 Google Maps 計算，不會把直線當道路或保證班次。','按「結束行程」保留這一份，接著下載或複製到 Gemini。也能到「自訂地點」編輯自己的生活圈，填上確認過的座標後抽選。'],
+short:['可按「使用我的位置」由瀏覽器詢問定位，允許後從已收錄、有座標的附近候選推薦。拒絕、逾時或附近沒有資料，仍可手選縣市；實際店家請開附近美食查詢。','第一次預設臺中，也可先選所在縣市；按「我只有 2 小時」「半日微旅行」「雨天備案」即可抽選。時間以抵達抽中生活圈後計算，不含住處往返。','展開「調整這次心情」可選交通方式、喜好與一天行程。已抽結果保留自己的條件，重新抽選才套用新條件。','每站可「換一站」而保留其他站；雨天採單館慢遊，換站也只抽室內候選。按「找附近美食」到 Google Maps 選實際店家。','下方地圖標示有座標的地點；沒有座標時請按地點查詢確認。導航由 Google Maps 計算，不會把直線當道路或保證班次。','按「結束行程」保留這一份，接著下載或複製到 Gemini。也能到「自訂地點」編輯自己的生活圈，填上確認過的座標後抽選。'],
 adventure:['選出發縣市與目的縣市，也可按「驚喜目的地」隨機決定。','按「抽出發列車」，再按「登車，出發」。列車與旅費是遊戲設定。','選隨興、美食或文化偏好，按「擲骰子，下一站」。骰子從還沒走訪的地點抽選。','按「到站，看看能做什麼」，選吃點心、聽故事或買紀念品，才會正式蓋章並加入行程。遇到事件也要做選擇。','通常有 6 回合，高鐵為 7 回合；目標是 6 枚景點章、2 次美食和 4 點文化。也能提前結束，不必等回合用完。','切到「看地圖」看足跡；背包小吃 ↗ 可查當時景點附近美食。切到「自訂地點」可修改這個縣市的 8 站，套用會重玩。'],
 taiwan:['從全臺候選地點隨機決定下一站；可先選博物館、美術館、圖書館、步道或老街類型。','選遊戲出發縣市，再按擲骰子、擲飛鏢或轉輪盤，三種方式都是隨機抽選。','結果加入右側／下方的旅行清單，同張清單不重複抽已選地點；可移除不想要的地點。','切到「看地圖」查看候選清單或查詢位置；切到「自訂地點」可輸入自己的地點並套用。跨縣市清單可交給 AI 分天安排。'],
 county:['先從下拉選單挑縣市，或用骰子、飛鏢、輪盤抽出縣市。','進入縣市後，再選想去的類型，按任一抽選按鈕決定景點。','每抽一次就加入本縣市旅行清單，切換類型不會刪除已抽行程。各縣市分開儲存。','可在「自訂地點」替換候選清單；使用自訂清單時，類別篩選暫停。套用新清單會先確認是否清除該清單的抽選紀錄。'],
@@ -40,8 +40,8 @@ nav.onkeydown=e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))re
 const setMode=IslandPlanActions.setMode;IslandPlanActions.setMode=next=>{const changed=next!==mode;mode=next;setMode(next);show(changed?'play':view);};
 window.IslandWorkspace={show};
 for(const [key,parent]of Object.entries({short:$('short-finish'),adventure:document.querySelector('.adv-dice-zone'),taiwan:document.querySelector('.ex-machine'),county:document.querySelector('.ex-machine'),lunch:document.querySelector('.ex-machine'),lottery:$('ex-lottery'),classic:document.querySelector('#classic-game .side')})){
- const bar=document.createElement('section');bar.className='trip-finishbar';bar.dataset.tripMode=key;bar.innerHTML='<p>收好這趟旅程</p><div><button type="button" class="btn" data-trip-action="finish">結束行程</button><button type="button" class="btn" data-trip-action="download">下載行程</button><button type="button" class="btn btn-primary" data-trip-action="ai">AI 排行程</button></div><small>保留已選地點，接著下載或交給 AI 排序。</small>';
- bar.querySelectorAll('button').forEach(b=>b.onclick=()=>b.dataset.tripAction==='finish'?IslandPlanActions.finish():IslandPlanActions.goPlan(b.dataset.tripAction));parent.append(bar);
+ const bar=document.createElement('section');bar.className='trip-finishbar';bar.dataset.tripMode=key;bar.innerHTML='<p>收好這趟旅程</p><div><button type="button" class="btn" data-trip-action="finish">結束行程</button><button type="button" class="btn" data-trip-action="download">下載行程</button><button type="button" class="btn btn-primary" data-trip-action="ai">AI 排行程</button><button type="button" class="btn" data-trip-action="restart" hidden>重新開始這個玩法</button></div><small>保留已選地點，接著下載或交給 AI 排序。</small>';
+ bar.querySelectorAll('button').forEach(b=>b.onclick=()=>b.dataset.tripAction==='finish'?IslandPlanActions.finish():b.dataset.tripAction==='restart'?IslandPlanActions.replay():IslandPlanActions.goPlan(b.dataset.tripAction));parent.append(bar);
 }
 // 各模式共用同一組收尾入口。
 show('play');IslandPlanActions.refresh();})();
