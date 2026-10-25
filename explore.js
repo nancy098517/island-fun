@@ -32,9 +32,9 @@ const cultureMeta={};
 for(const [county,groups]of Object.entries(IslandLunch.culture)){groups.forEach((names,i)=>names.forEach(raw=>{const name=({'三義木雕老街':'三義木雕街','芹壁聚落老街':'北竿芹壁聚落','聖母山莊國家步道（抹茶山）':'抹茶山（聖母山莊）'})[raw]||raw;if(!COUNTY[county].includes(name))COUNTY[county].push(name);const key=county+' '+name;const meta=cultureMeta[key]||(cultureMeta[key]={categories:[],provided:true});meta.categories.push(['museum','art','library','trail','street'][i]);}));}
 const KEY='island-fun-explore-v2';
 const $=id=>document.getElementById(id);
-const MODES=['adventure','taiwan','county','lunch','lottery','classic'];
+const MODES=['short','adventure','taiwan','county','lunch','lottery','classic'];
 const DEFAULT_LUNCH=['礁溪柯家蔥油餅', '熹湯鋪子【台中中華店】', '好家木瓜牛奶', '縱卝公滷', '京燉滷味', '健身舒肥水煮餐盒', '泓維便當店', 'cama', '露易莎', '星巴克', '蓮尾一鳴 豚骨拉麵專門店', '春水堂', '童話樹簡餐廳', '麥當勞', 'Subway', 'Sukiya'];
-let s={mode:'adventure',county:'',campus:'三民校區',routes:{},origins:{},custom:{},lunch:DEFAULT_LUNCH, lunchRevision:2, lottery:{text:'',count:1,result:[]},last:null};
+let s={mode:'short',county:'',campus:'三民校區',routes:{},origins:{},custom:{},lunch:DEFAULT_LUNCH, lunchRevision:2, lottery:{text:'',count:1,result:[]},last:null};
 let busy=false;
 try {
  const v=JSON.parse(localStorage.getItem(KEY));
@@ -46,7 +46,7 @@ if(!s.lottery || typeof s.lottery.text!=='string'||s.lottery.text.length>20000||
 if(!s.origins||typeof s.origins!=='object'||Array.isArray(s.origins)||!Object.values(s.origins).every(x=>IslandTransport.COUNTIES.includes(x)))s.origins={};
 if(!['all','museum','art','library','trail','street'].includes(s.category))s.category='all';
 if(!s.finished||typeof s.finished!=='object'||Array.isArray(s.finished))s.finished={};
-if(!s.adventureIntro){s.mode='adventure';s.adventureIntro=true;}
+if(!s.adventureIntro){s.mode='short';s.adventureIntro=true;}
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(s));$('ex-save').textContent='選擇與各地圖行程已儲存在此瀏覽器。';$('lottery-save').textContent='抽籤設定與上次結果已儲存。';}catch{$('ex-save').textContent='目前無法儲存，離開前請先複製行程。';$('lottery-save').textContent='目前無法儲存，請先複製抽籤結果。';}}
 const routeKey=()=>s.mode==='county'?'county:'+s.county:s.mode==='lunch'?'lunch:'+s.campus:'taiwan';
 const route=()=>s.routes[routeKey()] || [];
@@ -78,7 +78,8 @@ function makeLink(label,url){const a=document.createElement('a');a.textContent=l
 function render(){
  if(window.IslandPlanActions)IslandPlanActions.setMode(s.mode);
  document.querySelectorAll('[data-ex-mode]').forEach(b=>{const on=b.dataset.exMode===s.mode;b.setAttribute('aria-pressed',String(on));});
- $('classic-game').hidden=s.mode!=='classic';$('ex-play').hidden=['adventure','classic','lottery'].includes(s.mode);$('ex-lottery').hidden=s.mode!=='lottery';
+ $('classic-game').hidden=s.mode!=='classic';$('ex-play').hidden=['short','adventure','classic','lottery'].includes(s.mode);$('ex-lottery').hidden=s.mode!=='lottery';
+ $('short-trip').hidden=s.mode!=='short';if(s.mode==='short'){$('adventure-game').hidden=true;IslandAdventure.deactivate();IslandMap.hide();IslandQuickTrip.activate();return;}
  $('adventure-game').hidden=s.mode!=='adventure';if(s.mode==='adventure'){IslandMap.hide();IslandAdventure.activate();return;}IslandAdventure.deactivate();
  if(s.mode==='lottery'){IslandMap.hide();renderLottery();return;}
  if(s.mode==='classic'){document.dispatchEvent(new Event('island:classic'));return;}
