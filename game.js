@@ -278,12 +278,15 @@
   /* ---------- 4. 骰子、移動、事件 ---------- */
 
   async function rollDice() {
+    window.IslandSound?.unlock();
     els.die.classList.add("rolling");
     const end = performance.now() + CONFIG.diceRollMs;
     while (performance.now() < end) {
+      window.IslandSound?.play("dice");
       showFace(randInt(1, 6));
       await sleep(80);
     }
+    window.IslandSound?.play("done");
     const value = randInt(1, 6);
     showFace(value);
     els.die.classList.remove("rolling");
@@ -624,3 +627,4 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
 })();
+

@@ -118,20 +118,23 @@ function drawWheel(list,rotation){
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 async function draw(method){
  if(busy||s.finished[routeKey()])return;const list=candidates();if(!list.length)return;
+ window.IslandSound?.unlock();
  busy=true;render();const index=randomIndex(list.length);const chosen=list[index];const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;const fast=new URLSearchParams(location.search).has('fast');const ms=fast||reduce?0:75;
  try{
   if(method==='wheel'){
-   for(let k=0;k<=20;k++){drawWheel(list, k/20*(1080-(index+.5)*360/list.length));await wait(ms);}
+   for(let k=0;k<=20;k++){window.IslandSound?.play('tick');drawWheel(list, k/20*(1080-(index+.5)*360/list.length));await wait(ms);}
    setStatus(`輪盤停在第 ${index+1} 個選項：${chosen.name}`);
   } else if(method==='dart'){
    drawWheel(list,0);const svg=$('ex-visual').querySelector('svg'),angle=((index+.5)*360/list.length-90)*Math.PI/180;
    for(let k=0;k<6;k++){setStatus('瞄準中'+'.'.repeat(k%3+1));await wait(ms*2);}
+   window.IslandSound?.play('throw');await wait(ms?180:0);window.IslandSound?.play('hit');
    const marker=svgEl('text',{x:160+90*Math.cos(angle),y:169+90*Math.sin(angle),'text-anchor':'middle','font-size':30});marker.textContent='🎯';svg.append(marker);setStatus(`飛鏢隨機落在第 ${index+1} 區：${chosen.name}`);
   } else {
    const dice=[];let n=index;let digits=1;while(6**digits<list.length)digits++;for(let k=0;k<digits;k++){dice.unshift(n%6+1);n=Math.floor(n/6);}
-   const faces=['⚀','⚁','⚂','⚃','⚄','⚅'];for(let k=0;k<9;k++){const div=document.createElement('div');div.className='ex-dice';div.textContent=Array.from({length:digits},()=>faces[randomIndex(6)]).join(' ');$('ex-visual').replaceChildren(div);await wait(ms);}
+   const faces=['⚀','⚁','⚂','⚃','⚄','⚅'];for(let k=0;k<9;k++){window.IslandSound?.play('dice');const div=document.createElement('div');div.className='ex-dice';div.textContent=Array.from({length:digits},()=>faces[randomIndex(6)]).join(' ');$('ex-visual').replaceChildren(div);await wait(ms);}
    $('ex-visual').firstChild.textContent=dice.map(v=>faces[v-1]).join(' ');setStatus(`骰子編碼 ${dice.join('、')} → 第 ${index+1} 個選項：${chosen.name}（各候選等機率）`);
   }
+  window.IslandSound?.play('done');
   if(s.mode==='county'&&!s.county){s.county=chosen.name;s.last=null;busy=false;render();setStatus(`抽到${chosen.name}！現在可繼續抽當地下一站。`);}
   else {const k=routeKey();if(s.mode!=='lunch'){const previous=route().at(-1);const from=previous?IslandTransport.countyOf(previous.query):(s.origins[k]||'臺北市');chosen.transport=IslandTransport.draw(from,IslandTransport.countyOf(chosen.query));}s.routes[k]=[...route(),chosen];s.last=chosen;busy=false;const visual=$('ex-visual').firstChild;render();if(visual)$('ex-visual').replaceChildren(visual);}
   persist();
@@ -186,3 +189,4 @@ for(const id of ['ex-map-places','ex-foods','lottery-values'])$(id).addEventList
 const refreshPlan=()=>IslandPlanActions.refresh();document.addEventListener('click',()=>setTimeout(refreshPlan,0));
 render();persist();
 })();
+

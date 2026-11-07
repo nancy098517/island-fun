@@ -47,8 +47,8 @@ function paint(){const canvas=$('adv-map'),ctx=canvas.getContext('2d');if(!ctx)r
 }
 function selectTarget(die){const unseen=SPOTS.map((p,i)=>({p,i})).filter(x=>!s.visited.includes(x.i));const preferred=unseen.filter(x=>x.p.kind===s.intent);const pool=preferred.length?preferred:unseen;return pool[(die-1)%pool.length].i;}
 const delay=ms=>new Promise(r=>setTimeout(r,new URLSearchParams(location.search).has('fast')||matchMedia('(prefers-reduced-motion: reduce)').matches?0:ms));
-async function roll(reroll=false){if(busy||s.phase!=='travel'||(!reroll&&s.target>=0)||reroll&&s.reroll<1)return;busy=true;if(reroll)s.reroll--;s.target=-1;render();
- try{for(let i=0;i<8;i++){$('adv-die').textContent=['⚀','⚁','⚂','⚃','⚄','⚅'][random(6)];await delay(65);}s.die=random(6)+1;s.target=selectTarget(s.die);save();log(`擲出 ${s.die} 點，下一站是${SPOTS[s.target].name}。`);const a=s.current>=0?xy(SPOTS[s.current]):xy(SPOTS[0]),b=xy(SPOTS[s.target]);if(a&&b)for(let k=1;k<=20;k++){token={x:a.x+(b.x-a.x)*k/20,y:a.y+(b.y-a.y)*k/20};paint();await delay(30);}}
+async function roll(reroll=false){if(busy||s.phase!=='travel'||(!reroll&&s.target>=0)||reroll&&s.reroll<1)return;window.IslandSound?.unlock();busy=true;if(reroll)s.reroll--;s.target=-1;render();
+ try{for(let i=0;i<8;i++){window.IslandSound?.play('dice');$('adv-die').textContent=['⚀','⚁','⚂','⚃','⚄','⚅'][random(6)];await delay(65);}window.IslandSound?.play('done');s.die=random(6)+1;s.target=selectTarget(s.die);save();log(`擲出 ${s.die} 點，下一站是${SPOTS[s.target].name}。`);const a=s.current>=0?xy(SPOTS[s.current]):xy(SPOTS[0]),b=xy(SPOTS[s.target]);if(a&&b)for(let k=1;k<=20;k++){token={x:a.x+(b.x-a.x)*k/20,y:a.y+(b.y-a.y)*k/20};paint();await delay(30);}}
  finally{token=null;busy=false;render();save();}}
 function button(label,action,disabled=false){const b=document.createElement('button');b.type='button';b.className='btn';b.textContent=label;b.disabled=disabled||busy;b.onclick=action;return b;}
 function arrive(){if(busy||s.target<0)return;s.phase='stop';save();render();}
@@ -121,3 +121,4 @@ IslandPlanActions.register('adventure',{sources:['selected','all'],snapshot(sour
 if(document.fonts)document.fonts.ready.then(paint);
 render();
 })();
+
